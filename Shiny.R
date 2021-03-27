@@ -2,8 +2,6 @@ source("lastTile.R")
 source("event.R")
 source("maxcode.R")
 
-getRandQuestionNo()
-
 ui <- dashboardPage(
   dashboardHeader(title="CARElorie"),
   dashboardSidebar(
