@@ -174,6 +174,14 @@ server <- function(input, output, session) {
     showModal(EventsModal(EventNo))
     
     #Should add in parts to modify Hunger, Calories and Board Position values.
+    if (getEventType(EventNo) == 1){
+      #Got a good event, decrease Calories, increase Hunger, PLEASE ADVISE how much 
+      vals$calories =vals$calories - 5
+      vals$hunger =vals$hunger + 5  
+    }else{
+      vals$calories =vals$calories + 5
+      vals$hunger =vals$hunger - 5
+    }
   }
   )
   observeEvent(input$continuebutton, {
