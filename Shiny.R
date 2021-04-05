@@ -273,7 +273,7 @@ server <- function(input, output, session) {
     vals$dieNumber = as.integer(runif(1,1,7)) 
     # For testing set the dieNumber to 1
     #vals$dieNumber <- 1
-    vals$pieces <- updatevals(vals$pieces,vals$dieNumber)
+    vals$pieces <- updateBoardState(vals$pieces,vals$dieNumber)
     #omitted hunger alteration for testing
     #vals$hunger <- vals$hunger - vals$dieNumber
     if (vals$hunger<0) {
