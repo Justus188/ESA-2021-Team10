@@ -20,7 +20,7 @@ getallMenu <- function(){
 getMenu <- function(){
   # Extract random menu from database
   
-  # output will be dataframe containing menuitem,calories,hungereffect and append a none option and null option
+  # output will be dataframe containing menuitem,calories,hungereffect and append a none option and null option, and taken from a random food type of the total menu
   #test menu
   restaurantmenu <- data.frame(menuitem = c("Choose Something","fish","chicken","beef","None"),calories = c(NA,100,200,300,0), hungereffect = c(NA,1,1,1,1))
   restaurantmenu
@@ -52,7 +52,7 @@ menuModal <- function(failed = FALSE){
 checktile <- function(row,col){
   tile <- -1
   playerpos <- paste(row,col)
-  if (playerpos %in% eventlist) {tile <- 0}
+  if (playerpos %in% eventlist) {tile <- 0} else {tile <- 1}
   #tile 0 means event, tile 1 means restaurant
   tile
 }
