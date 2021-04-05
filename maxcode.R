@@ -114,11 +114,11 @@ updateBoardState <- function(pieces,dieNumber){
   pieces
 }
 
-getImageId <- function(gridrow,gridcol,boardstate){
-  imageid <- boardstate$pieces[gridrow,gridcol]
+getImageId <- function(gridrow,gridcol,vals){
+  imageid <- vals$pieces[gridrow,gridcol]
   imageid
 }
-getImageStyle <- function(gridrow,gridcol,boardstate){
+getImageStyle <- function(gridrow,gridcol,vals){
   imgstyle <- "border: 2px solid blue;"
   # If the cell should be highlighted draw a blue border around it
   #if (boardstate$highlights[gridrow,gridcol])imgstyle <- "border: 2px solid blue;"
