@@ -52,8 +52,8 @@ menuModal <- function(failed = FALSE){
 checktile <- function(row,col){
   tile <- -1
   playerpos <- paste(row,col)
-  if (playerpos %in% eventlist) {tile <- 0} else {tile <- 1}
-  #tile 0 means event, tile 1 means restaurant
+  if (playerpos %in% eventlist) {tile <- 0} else if (playerpos == paste(1,1)) {tile <- 2} else {tile <- 1}
+  #tile 0 means event, tile 1 means restaurant, tile 2 means end game
   tile
 }
 
