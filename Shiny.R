@@ -77,8 +77,12 @@ server <- function(input, output, session) {
   GRIDSIZE <- 4
   
   pieces <- matrix(rep(CELLEMPTY,GRIDSIZE*GRIDSIZE),nrow=GRIDSIZE,ncol=GRIDSIZE,byrow=TRUE)
+  #starting position of player
   pieces[2,1] <- CELLRED
+  #df containing all menuitems
   allmenu <- getallMenu()
+  #list containing coordinates in the form of paste(row,col) to check if player is on event tile
+  eventlist <- list()
     
   ### Initialise reactive values
   vals <- reactiveValues(calories = 9,
