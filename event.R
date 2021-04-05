@@ -37,6 +37,12 @@ getEventDescription <- function(event_no){
   as.character(result[[1]])
 }
 
+getEventType <- function(event_no){
+  query <- str_c("SELECT EventType FROM CarelorieEvents WHERE EventNumber=", event_no)
+  result <- getQuery(query)
+  as.numeric(result[[1]])
+}
+
 getRandQuestionNo <- function(){
   query <- "SELECT QuestionNo FROM CarelorieQuestions ORDER BY RAND() LIMIT 1"
   result <- getQuery(query)
