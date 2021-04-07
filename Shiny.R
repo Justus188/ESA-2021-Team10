@@ -295,8 +295,14 @@ server <- function(input, output, session) {
     currentcol <- as.integer((locationindex-1)/GRIDSIZE)+1
     currentrow <- locationindex - (gridcol-1)*GRIDSIZE
     # checktile(row,col) checks what kind of tile you are in, returns 1 when restaurant, 2 when last tile, 0 when event
-    if (checktile(currentrow,currentcol) == 1) {vals$boardstate = 1} else if ( checktile(currentrow,currentcol) == 2) {vals$boardstate = 2) else if (checktile(currentrow,currentcol) == 0) {vals$boardstate = 0)
-    
+    vals$boardstate <- checktile(currentrow, currentcol) # r creates copies, not pointers, so this should be fine
+    switch(vals$boardstate+1,
+           #Code for boardstate=0
+           ,
+           #Code for boardstate=1
+           ,
+           showModal(endModal()) # boardstate = 2
+    )
   })
 }
 
