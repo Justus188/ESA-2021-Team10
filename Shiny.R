@@ -1,6 +1,6 @@
 source("lastTile.R")
 source("event.R")
-source("maxcode.R")
+source("restaurant+movement.R")
 
 ui <- dashboardPage(
   dashboardHeader(title="CARElorie"),
@@ -96,7 +96,6 @@ server <- function(input, output, session) {
   ### MODULES TO BE ADDED - Start the game
   observeEvent(input$start, {
     print("Starting game")
-    removeModal()
   }) #Insert start game code here
   
   ### MODULES TO BE ADDED - Game body goes here
