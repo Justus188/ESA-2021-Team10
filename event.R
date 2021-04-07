@@ -6,7 +6,7 @@ library(tidyverse)
 source("lastTile.R")
 # source("setAWSPassword.R") #5FqGmSBe
 # getOption("AWSPassword")
-# 
+#
 # getAWSConnection <- function(){
 #   conn <- dbConnect(
 #     drv = RMySQL::MySQL(),
@@ -46,6 +46,11 @@ getEventType <- function(event_no){
 getRandQuestionNo <- function(){
   query <- "SELECT QuestionNo FROM CarelorieQuestions ORDER BY RAND() LIMIT 1"
   result <- getQuery(query)
+
+  #Set the result to vals
+  vals$QuestionNo <- as.numeric(result[[1]])
+
+  #Return the result
   as.numeric(result[[1]])
 }
 
@@ -61,7 +66,7 @@ checkAnswer <- function(qn_no,selected_ans){
   query <- str_c("SELECT QuestionAnswer FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
   result <- getQuery(query)
   result <- as.character(result[[1]])
-  
+
   if (selected_ans==result){
     print("Check Result: Correct")
     TRUE
@@ -74,16 +79,16 @@ checkAnswer <- function(qn_no,selected_ans){
 
 QuestionModal <- function(correct = FALSE, wrong=FALSE, question_no){
   modalDialog(
-    #Show randomly generated question  
+    #Show randomly generated question
     title = "Event",
     radioButtons(inputId="selectedAns",
     label=getQuestionStatement(question_no),
     choices = c("TRUE", "FALSE")),
-   
+
   if (correct==TRUE) {div(tags$b("Answer is Correct! Press proceed to continue"))},
-  
+
   if (wrong==TRUE) {div(tags$b("Answer is Incorrect! Press proceed to continue"))},
-    
+
   footer = tagList(
     if(wrong==FALSE & correct==FALSE){actionButton(inputId="checkbutton", label="Check!")}else{actionButton(inputId="proceedbutton", label="Proceed!")}
 )
@@ -99,7 +104,7 @@ EventsModal <- function(event_no){
       title = event_name,
       tags$h2(event_desc),
       img(src=image_name,width="200px",height="200px"),
-      
+
       footer = tagList(
     actionButton(inputId="continuebutton", label="Continue")
       )
