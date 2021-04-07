@@ -85,10 +85,12 @@ server <- function(input, output, session) {
   eventlist <- list()
     
   ### Initialise reactive values
+  #boardstate represents movement,event,restaurant,last tile using NULL,0,1,2 respectively
   vals <- reactiveValues(calories = 9,
                          hunger = 10,
                          dieNumber = 2,
                          QuestionNo = NULL,
+                         boardstate = NULL,
                          action.log = data.frame(Food="Burger", Calories=as.integer(10), Hunger = "+10"))
   
   ### MODULES TO BE ADDED - Start the game
@@ -293,8 +295,7 @@ server <- function(input, output, session) {
     currentcol <- as.integer((locationindex-1)/GRIDSIZE)+1
     currentrow <- locationindex - (gridcol-1)*GRIDSIZE
     # checktile(row,col) checks what kind of tile you are in, returns 1 when restaurant, 2 when last tile, 0 when event
-    # peck kee and hock lam please add in whatever you want to happen when player reaches last tile or event
-    if (checktile(currentrow,currentcol) == 1) {showModal(menuModal())}
+    if (checktile(currentrow,currentcol) == 1) {vals$boardstate = 1} else if ( checktile(currentrow,currentcol) == 2) {vals$boardstate = 2) else if (checktile(currentrow,currentcol) == 0) {vals$boardstate = 0)
     
   })
 }
