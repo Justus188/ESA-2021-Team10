@@ -294,8 +294,6 @@ server <- function(input, output, session) {
     switch(vals$boardstate+1,
            #Code for boardstate=0
            ,
-           showModal(QuestionModal(question_no=getRandQuestionNo()))#Code for boardstate=1
-           ,
            showModal(endModal()) # boardstate = 2
     )
   })
