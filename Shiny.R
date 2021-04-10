@@ -44,7 +44,7 @@ ui <- dashboardPage(
                         # Then, to superimpose images, style them to be 'position:relative;z-order:999'
                         
                         sidebarLayout( 
-                            mainPanel(box(img(src='board.png',style="position:absolute;z-order:0",width="750px",height="500px"),
+                            mainPanel(box(img(src='board.png',style="position:absolute;z-order:0",width="800px",height="550px"),
                                           imageOutput("cell11",height="100px",width="100px",click="click11",inline=TRUE), # height and width are for the containing div, not the image itself
                                           imageOutput("cell12",height="100px",width="100px",click="click12",inline=TRUE),  # height and width are for the containing div, not the image itself
                                           imageOutput("cell13",height="100px",width="100px",click="click13",inline=TRUE), # height and width are for the containing div, not the image itself
@@ -347,6 +347,76 @@ server <- function(input, output, session) {
            showModal(endModal()) # boardstate = 2
     )
   })
+    
+        # retrieve 5 random food from database, store their respective images, ingredient lista and filling levels in reactive_value
+    reactive_value <- reactiveValues(food1_image = NULL,
+                                     food2_image = NULL,
+                                     food3_image = NULL,
+                                     food4_image = NULL,
+                                     food5_image = NULL,
+                                     food1_ingredients=NULL, 
+                                     food2_ingredients= NULL, 
+                                     food3_ingredients= NULL, 
+                                     food4_ingredients= NULL, 
+                                     food5_ingredients= NULL)
+    
+    reactive_value$food1_image = "FOF.png"                                      # for testing
+    reactive_value$food2_image = "food_main_mcspicy.png"                        # for testing
+    reactive_value$food3_image = "McChicken.png"                                # for testing
+    reactive_value$food4_image = "cheeseburger.png"                             # for testing
+    reactive_value$food5_image = "mcwrapgrilled.png"                            # for testing
+    reactive_value$food1_ingredients = "Fish fillet, cheese, buns"              # for testing
+    reactive_value$food2_ingredients = "Spicy Chicken fillet, lettuce, buns"    # for testing
+    reactive_value$food3_ingredients = "Chicken fillet, lettuce, buns"          # for testing
+    reactive_value$food4_ingredients = "Beef patty, cheese, pickles, buns"      # for testing
+    reactive_value$food5_ingredients = "Grilled chicken, lettuce, tortilla"     # for testing
+    
+    output$img1 <- renderUI({
+        if(input$Chosenfood == "food1"){
+            img(src = reactive_value$food1_image,height = 240, width = 300)}
+        else if(input$Chosenfood == "food2"){
+            img(src = reactive_value$food2_image, height = 240, width = 300)}
+        else if(input$Chosenfood == "food3"){
+            img(src = reactive_value$food3_image,height = 240, width = 300)}
+        else if(input$Chosenfood == "food4"){
+            img(src = reactive_value$food4_image,height = 240, width = 300)}
+        else if(input$Chosenfood == "food5"){
+            img(src = reactive_value$food5_image,height = 240, width = 300)}
+    })
+    
+    output$foodingredients <- renderText({
+        if(input$Chosenfood == "food1"){
+            paste("Main ingredients:", reactive_value$food1_ingredients)}
+        else if(input$Chosenfood == "food2"){
+            paste("Main ingredients:", reactive_value$food2_ingredients)}
+        else if(input$Chosenfood == "food3"){
+            paste("Main ingredients:", reactive_value$food3_ingredients)}
+        else if(input$Chosenfood == "food4"){
+            paste("Main ingredients:", reactive_value$food4_ingredients)}
+        else if(input$Chosenfood == "food5"){
+            paste("Main ingredients:", reactive_value$food5_ingredients)}
+    })
+    
+    output$fillinglevel <- renderText({
+        if(input$Chosenfood == "food1"){
+            paste("Fullness factor:??")}
+        else if(input$Chosenfood == "food2"){
+            paste("Fullness factor:??")}
+        else if(input$Chosenfood == "food3"){
+            paste("Fullness factor:??")}
+        else if(input$Chosenfood == "food4"){
+            paste("Fullness factor:??")}
+        else if(input$Chosenfood == "food5"){
+            paste("Fullness factor:??")}
+        
+    })
+    
+    output$hunger_scale <- renderUI({
+        #select the appropriate hunger level image from www
+        image_hunger <- vals$hunger 
+        imgsource = switch(image_hunger, "www/hunger1.png","www/hunger2.png","www/hunger3.png","www/hunger4.png","www/hunger5.png","www/hunger6.png")
+        
+    })
 }
 
 shinyApp(ui, server)
