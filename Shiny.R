@@ -9,6 +9,7 @@ ui <- dashboardPage(
     dashboardSidebar(
         sidebarMenu(
             #https://fontawesome.com/icons?d=gallery
+            id = "tabSelect",
             menuItem("Welcome", tabName = "welcome", icon = icon("door-open")),
             menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board")),
             menuItem("Leaderboard",tabName = "leaderboard", icon=icon("trophy"))
@@ -102,10 +103,10 @@ ui <- dashboardPage(
                     h2("Publish Your Score"),
                     fluidRow(
                         box(
-                            title = "See where you stand",width=12,
-                            #actionButton("playgame", "Play the Game"),
-                            #htmlOutput("score"),
-                            #uiOutput("moreCoontrols")
+                            title = "See where you stand!",width=12,
+                            tableOutput("leaderboard"),
+                            "Not here? Play again!",
+                            actionButton("start", "Start the Game!")
                         ))
                     
                     
@@ -145,6 +146,7 @@ server <- function(input, output, session) {
 
   ### MODULES TO BE ADDED - Start the game
   observeEvent(input$start, {
+    updateTabItems(session, "tabSelect", "gameboard")
     print("Starting game")
   }) #Insert start game code here
 
