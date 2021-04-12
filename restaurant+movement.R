@@ -103,7 +103,7 @@ updateBoardState <- function(pieces,dieNumber,gridsize){
   newlocation <- list(row=gridrow,col=gridcol)
     # MONOPOLY
   while (dieNumber>0) {
-    newlocation <- getSingleStepLocation(newlocation$row,newlocation$col)
+    newlocation <- getSingleStepLocation(newlocation$row,newlocation$col,gridsize)
     dieNumber <- dieNumber -1
     }
   # Update the newlocation with the pieces that are there
