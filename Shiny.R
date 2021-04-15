@@ -20,10 +20,11 @@ ui <- dashboardPage(
         tabItems(
             # First tab content
             tabItem(tabName = "welcome",
-                    h1("Welcome, instructions"),
-                    h2("Start the game by clicking on the gameboard tab on the left"),
+                    h1("Welcome to CARElorie!"),
+                    h2("Start the game by choosing your player token and clicking on the Start button!"),
                     tags$br(),
-                    selectInput("playertoken", "Select your player token:",c(1,2,3)),
+                    selectInput("playertoken", "Select your player token:",c("burger","fries","apple")),
+                    uiOutput("playertokenimg"), # image output code line 355-ish
                     tags$h4("Instructions"),
                     tags$p(" INSERT INSTRUCTIONS "),
                     actionButton("start", "Start the Game!"),
@@ -45,7 +46,7 @@ ui <- dashboardPage(
                         # Then, to superimpose images, style them to be 'position:relative;z-order:999'
                         
                         sidebarLayout( 
-                            mainPanel(box(img(src='board.png',style="position:absolute;z-order:0",width="800px",height="550px"),
+                            mainPanel(width=9,box(img(src='board.png',style="position:absolute;z-order:0",width="920px",height="550px"),
                                           imageOutput("cell11",height="100px",width="100px",click="click11",inline=TRUE), # height and width are for the containing div, not the image itself
                                           imageOutput("cell12",height="100px",width="100px",click="click12",inline=TRUE),  # height and width are for the containing div, not the image itself
                                           imageOutput("cell13",height="100px",width="100px",click="click13",inline=TRUE), # height and width are for the containing div, not the image itself
@@ -67,7 +68,7 @@ ui <- dashboardPage(
                                           imageOutput("cell44",height="100px",width="100px",click="click44",inline=TRUE),  # height and width are for the containing div, not the image itself
                             )),
                             
-                            sidebarPanel( width = 4,
+                            sidebarPanel( width = 3,
                                           selectInput("r_or_e", label = "Player lands on:", c("movement","event","restaurant")),
                                           # only show this panel if player is rolling the die
                                           conditionalPanel(
@@ -149,7 +150,8 @@ server <- function(input, output, session) {
     updateTabItems(session, "tabSelect", "gameboard")
     print("Starting game")
   }) #Insert start game code here
-
+    ## update the playertoken image that the player chose 
+    
   ### MODULES TO BE ADDED - Game body goes here
   output$gameboard <- renderImage(NULL)
 
@@ -350,6 +352,18 @@ server <- function(input, output, session) {
     )
   })
     
+      # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
+    output$playertokenimg <- renderUI({
+     if(input$playertoken == "burger"){
+        img(src = "token1.png",height = 50, width = 50)}
+      else if(input$playertoken == "fries"){
+        img(src = "token2.png", height = 50, width = 50)}
+      else if(input$playertoken == "apple"){
+       img(src = "token3.png",height = 50, width = 50)}
+    
+  })
+  
+    
         # retrieve 5 random food from database, store their respective images, ingredient lista and filling levels in reactive_value
     reactive_value <- reactiveValues(food1_image = NULL,
                                      food2_image = NULL,
@@ -375,15 +389,15 @@ server <- function(input, output, session) {
     
     output$img1 <- renderUI({
         if(input$Chosenfood == "food1"){
-            img(src = reactive_value$food1_image,height = 240, width = 300)}
+            img(src = reactive_value$food1_image,height = 200, width = 200)}
         else if(input$Chosenfood == "food2"){
-            img(src = reactive_value$food2_image, height = 240, width = 300)}
+            img(src = reactive_value$food2_image, height = 200, width = 200)}
         else if(input$Chosenfood == "food3"){
-            img(src = reactive_value$food3_image,height = 240, width = 300)}
+            img(src = reactive_value$food3_image,height = 200, width = 200)}
         else if(input$Chosenfood == "food4"){
-            img(src = reactive_value$food4_image,height = 240, width = 300)}
+            img(src = reactive_value$food4_image,height = 200, width = 200)}
         else if(input$Chosenfood == "food5"){
-            img(src = reactive_value$food5_image,height = 240, width = 300)}
+            img(src = reactive_value$food5_image,height = 200, width = 200)}
     })
     
     output$foodingredients <- renderText({
