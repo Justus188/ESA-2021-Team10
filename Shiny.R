@@ -4,6 +4,25 @@ source("restaurant+movement.R")
 library(shiny)
 library(shinydashboard)
 
+# retrieve 5 random food from database, store their respective names, images, ingredient list,
+# and filling levels in dataframe
+food1name = "Filet-O-fish"    # for testing
+food2name = "McSpicy"         # for testing
+food3name = "McChicken"       # for testing
+food4name = "Cheese Burger"   # for testing
+food5name = "McWrap"          # for testing
+
+food1_image = "FOF.png"                                      # for testing
+food2_image = "food_main_mcspicy.png"                        # for testing
+food3_image = "McChicken.png"                                # for testing
+food4_image = "cheeseburger.png"                             # for testing
+food5_image = "mcwrapgrilled.png"                            # for testing
+food1_ingredients = "Fish fillet, cheese, buns"              # for testing
+food2_ingredients = "Spicy Chicken fillet, lettuce, buns"    # for testing
+food3_ingredients = "Chicken fillet, lettuce, buns"          # for testing
+food4_ingredients = "Beef patty, cheese, pickles, buns"      # for testing
+food5_ingredients = "Grilled chicken, lettuce, tortilla"     # for testing
+
 ui <- dashboardPage(
     dashboardHeader(title = "CARElorie"),
     dashboardSidebar(
@@ -78,12 +97,12 @@ ui <- dashboardPage(
                                           ),
                                           
                                           # Only show this panel if land on restaurant tile
-                                          conditionalPanel(
-                                              condition = "input.r_or_e == 'restaurant'",
-                                              tags$h1("Menu"), # change the food names to random 5 food names from database
-                                              selectInput( inputId = "Chosenfood", label = "Please choose something:",   
-                                                           c( Filet_O_Fish = "food1", McSpicy = "food2", McChicken = "food3", CheeseBurger = "food4", Mcwrap = "food5" )
-                                              ), uiOutput("img1"), textOutput("foodingredients"), textOutput("fillinglevel"),actionButton("choosefood_yes","ok"),actionButton("choosefood_no","cancel")
+                                conditionalPanel(
+                                  condition = "input.r_or_e == 'restaurant'",
+                                  tags$h1("Menu"), # change the food names to random 5 food names from database
+                                  selectInput( inputId = "Chosenfood", label = "Please choose something:",   
+                                               c( food1name , food2name , food3name , food4name , food5name  )
+                                  ), uiOutput("img1"), textOutput("foodingredients"), textOutput("fillinglevel"),actionButton("choosefood_yes","ok"),actionButton("choosefood_no","cancel")
                                           )
                                           ,
                                           # Only show this panel if land on event
@@ -361,71 +380,48 @@ server <- function(input, output, session) {
       else if(input$playertoken == "apple"){
        img(src = "token3.png",height = 50, width = 50)}
     
+  })  
+
+    
+  output$img1 <- renderUI({
+    if(input$Chosenfood == food1name){
+      img(src = food1_image,height = 200, width = 200)}
+    else if(input$Chosenfood == food2name){
+      img(src = food2_image, height = 200, width = 200)}
+    else if(input$Chosenfood == food3name){
+      img(src = food3_image,height = 200, width = 200)}
+    else if(input$Chosenfood == food4name){
+      img(src = food4_image,height = 200, width = 200)}
+    else if(input$Chosenfood == food5name){
+      img(src = food5_image,height = 200, width = 200)}
   })
   
+  output$foodingredients <- renderText({
+    if(input$Chosenfood == food1name){
+      paste("Main ingredients:", food1_ingredients)}
+    else if(input$Chosenfood == food2name){
+      paste("Main ingredients:", food2_ingredients)}
+    else if(input$Chosenfood == food3name){
+      paste("Main ingredients:", food3_ingredients)}
+    else if(input$Chosenfood == food4name){
+      paste("Main ingredients:", food4_ingredients)}
+    else if(input$Chosenfood == food5name){
+      paste("Main ingredients:", food5_ingredients)}
+  })
+  
+  output$fillinglevel <- renderText({
+    if(input$Chosenfood == food1name){
+      paste("Fullness factor:??")}
+    else if(input$Chosenfood == food2name){
+      paste("Fullness factor:??")}
+    else if(input$Chosenfood == food3name){
+      paste("Fullness factor:??")}
+    else if(input$Chosenfood == food4name){
+      paste("Fullness factor:??")}
+    else if(input$Chosenfood == food5name){
+      paste("Fullness factor:??")}
     
-        # retrieve 5 random food from database, store their respective images, ingredient lista and filling levels in reactive_value
-    reactive_value <- reactiveValues(food1_image = NULL,
-                                     food2_image = NULL,
-                                     food3_image = NULL,
-                                     food4_image = NULL,
-                                     food5_image = NULL,
-                                     food1_ingredients=NULL, 
-                                     food2_ingredients= NULL, 
-                                     food3_ingredients= NULL, 
-                                     food4_ingredients= NULL, 
-                                     food5_ingredients= NULL)
-    
-    reactive_value$food1_image = "FOF.png"                                      # for testing
-    reactive_value$food2_image = "food_main_mcspicy.png"                        # for testing
-    reactive_value$food3_image = "McChicken.png"                                # for testing
-    reactive_value$food4_image = "cheeseburger.png"                             # for testing
-    reactive_value$food5_image = "mcwrapgrilled.png"                            # for testing
-    reactive_value$food1_ingredients = "Fish fillet, cheese, buns"              # for testing
-    reactive_value$food2_ingredients = "Spicy Chicken fillet, lettuce, buns"    # for testing
-    reactive_value$food3_ingredients = "Chicken fillet, lettuce, buns"          # for testing
-    reactive_value$food4_ingredients = "Beef patty, cheese, pickles, buns"      # for testing
-    reactive_value$food5_ingredients = "Grilled chicken, lettuce, tortilla"     # for testing
-    
-    output$img1 <- renderUI({
-        if(input$Chosenfood == "food1"){
-            img(src = reactive_value$food1_image,height = 200, width = 200)}
-        else if(input$Chosenfood == "food2"){
-            img(src = reactive_value$food2_image, height = 200, width = 200)}
-        else if(input$Chosenfood == "food3"){
-            img(src = reactive_value$food3_image,height = 200, width = 200)}
-        else if(input$Chosenfood == "food4"){
-            img(src = reactive_value$food4_image,height = 200, width = 200)}
-        else if(input$Chosenfood == "food5"){
-            img(src = reactive_value$food5_image,height = 200, width = 200)}
-    })
-    
-    output$foodingredients <- renderText({
-        if(input$Chosenfood == "food1"){
-            paste("Main ingredients:", reactive_value$food1_ingredients)}
-        else if(input$Chosenfood == "food2"){
-            paste("Main ingredients:", reactive_value$food2_ingredients)}
-        else if(input$Chosenfood == "food3"){
-            paste("Main ingredients:", reactive_value$food3_ingredients)}
-        else if(input$Chosenfood == "food4"){
-            paste("Main ingredients:", reactive_value$food4_ingredients)}
-        else if(input$Chosenfood == "food5"){
-            paste("Main ingredients:", reactive_value$food5_ingredients)}
-    })
-    
-    output$fillinglevel <- renderText({
-        if(input$Chosenfood == "food1"){
-            paste("Fullness factor:??")}
-        else if(input$Chosenfood == "food2"){
-            paste("Fullness factor:??")}
-        else if(input$Chosenfood == "food3"){
-            paste("Fullness factor:??")}
-        else if(input$Chosenfood == "food4"){
-            paste("Fullness factor:??")}
-        else if(input$Chosenfood == "food5"){
-            paste("Fullness factor:??")}
-        
-    })
+  })
     
     output$hunger_scale <- renderUI({
         #select the appropriate hunger level image from www
