@@ -93,7 +93,7 @@ ui <- dashboardPage(
                                         tags$h1("Menu"), # change the food names to random 5 food names from database
                                         selectInput(inputId = "Chosenfood", 
                                                     label = "Please choose something:",   
-                                                    getMenu()[,2]
+                                                    getMenu()[,"Food"]
                                         ),
                                         uiOutput("foodimg"), textOutput("foodingredients"), 
                                         textOutput("fillinglevel"),
