@@ -3,6 +3,8 @@ source("event.R")
 source("restaurant+movement.R")
 library(shiny)
 library(shinydashboard)
+#library(reactlog)
+#reactlog::reactlog_enable()
 
 # retrieve 5 random food from database, store their respective names, images, ingredient list,
 # and filling levels in dataframe
@@ -102,12 +104,13 @@ ui <- dashboardPage( ###########################################################
                                   createRow(8), tags$br(),
                                   createRow(9), tags$br()),
                         sidebarPanel( width = 2,
-                                      selectInput("r_or_e", label = "Player lands on:", c("movement","event","restaurant")),
+                                      "Hunger Meter:",
+                                      imageOutput("hunger_scale", height = "100px", width = "100px"),
                                       # only show this panel if player is rolling the die
                                       conditionalPanel(
                                           condition = "output.dice == true",
-                                          uiOutput("hunger_scale"),
-                                          imageOutput("die",height="410px",width="410px",click="clickdie",inline=TRUE)
+                                          "Click on the dice to roll for your movement this turn!",
+                                          imageOutput("die",height="100px",width="100px",click=clickOpts("clickdie", clip=F),inline=TRUE)
                                       ),
                                       
                                       # Only show this panel if land on restaurant tile
@@ -123,20 +126,21 @@ ui <- dashboardPage( ###########################################################
                                         actionButton("choosefood_yes","ok"),
                                         actionButton("choosefood_no","cancel")
                                       ),
+                                      
                                       # Only show this panel if land on event
                                       conditionalPanel(
-                                          condition = "output.event == true",
-                                          fluidPage(     
-                                                 uiOutput("EventPage1"),
-  uiOutput("EventPage2"),
-  uiOutput("EventPage3")                      )
+                                        condition = "output.event == true",
+                                        fluidPage(     
+                                          uiOutput("EventPage1"),
+                                          uiOutput("EventPage2"),
+                                          uiOutput("EventPage3")
                                         )
-                            )
+                                      )
                         )
                     )
             ),
             tabItem(tabName = "leaderboard", 
-                    h2("Publish Your Score"),
+                    h2("Hall of Fame"),
                     box(
                       title = "See where you stand!",width=12,
                       tableOutput("leaderboard"),
@@ -167,18 +171,19 @@ server <- function(input, output, session) {####################################
   ### Init #####################################################################
 
   allmenu <- getallMenu() #df with all menu items
+  leaderBoard <- renderTable({input$name.done; getLeaderBoard()}) #pregenerate leaderboard for use in multiple screens
   
-  ### Regenerate on new game ###################################################
+  ### Regenerate on new game # Shift to start() later ##########################
   isEvent <- matrix(runif(100, 0,1) <0.2, byrow=T, nrow=10) # matrix[row+1, col+1] of isEvent tile
 
-  vals <- reactiveValues(calories = 9,
-                         hunger = 10,
-                         dieNumber = 2,
+  vals <- reactiveValues(calories = 0,
+                         hunger = 2000,
+                         dieNumber = 6,
                          QuestionNo = NULL,
-                         event_no=NULL,
+                         event_no = NULL,
                          boardstate = -1,
                          playerpos = c(9, 9), # (row,col) track token location; each edge has length 10 starting from (10,10), ends(9,10)
-                         action.log = data.frame(Food="Burger", Calories=as.integer(10), Hunger = "+10"))
+                         action.log = data.frame(Event="Start", Calories=0, Hunger=2000))
   
   ### WORK IN PROGRESS: TO SHIFT DOWN EVENTUALLY ###############################
   output$img1 <- renderUI({
@@ -221,23 +226,16 @@ server <- function(input, output, session) {####################################
     
   })
   
-  output$hunger_scale <- renderUI({
-    #select the appropriate hunger level image from www
-    image_hunger <- vals$hunger 
-    imgsource = switch(image_hunger, "www/hunger1.png","www/hunger2.png","www/hunger3.png","www/hunger4.png","www/hunger5.png","www/hunger6.png")
-    
-  })
   
   ### RENDERING FUNCTIONS ######################################################
-  output$leaderboard <- renderTable({ 
-    numclicks=input$name.done
-    getLeaderBoard()
-  })
-  
+  # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
+  output$playertokenimg <- renderUI(img(src = getTokenSrc(input), height=50, width=50))
+
   observe({vals$playerpos
     mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input, isEvent)}, x=listofcells, y=genCellIds())
   })
   
+  output$hunger_scale <- renderImage(list(src = paste0("www/hunger", min(as.integer(7-vals$hunger/1000),1), ".png")), deleteFile=F)
   output$die <- renderImage({
     #select the icon appropriate for this die
     imageid <- vals$dieNumber
@@ -248,31 +246,32 @@ server <- function(input, output, session) {####################################
     list(src=imgsrc,style="position:relative;z-order:999;")
   },deleteFile=FALSE)
   
-  # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
-  output$playertokenimg <- renderUI(img(src = getTokenSrc(input), height=50, width=50))
+  output$leaderboard <- leaderBoard
   
   ### GAME LOGIC ###############################################################
-  observeEvent(input$start_welcome,{
-    removeModal()
-    updateTabItems(session, "tabSelect", "gameboard")
-    print("Starting game")
-  }, ignoreInit = T)
+  # observe(if(any(c(input$start_welcome, input$start_leaderboard, input$start_endModal, input$start_publishedModal)>0)){ #TODO: Fix newly generated buttons prematurely firing if another button is previously used
+  #   removeModal()
+  #   # Reinitialise variables; TODO: Implement once gameboard is conditionally hidden by start_welcome
+  #   updateTabItems(session, "tabSelect", "gameboard")
+  #   print("Starting game")
+  # })
   
-  observeEvent(input$clickdie,{
+  observeEvent(input$clickdie,{ #TODO: Implement a counter to click spam
     vals$dieNumber = as.integer(runif(1,1,7))
-    
     vals$playerpos <- updateBoardState(vals$playerpos,vals$dieNumber)
-    
     vals$hunger <- vals$hunger - 100*vals$dieNumber
     
     if (vals$hunger<0) { #check for starving
       showModal(starvingModal())
       vals$calories <- vals$calories + 1500
       vals$hunger <- vals$hunger + 1000
+      vals$action.log <- add_row(vals$action.log, Event="Binge ate due to hunger", Calories=1500, Hunger=1000)
     }
     
     currentrow <- vals$playerpos[1]
     currentcol <- vals$playerpos[2]
+    
+    print(paste0("Die rolled: ", vals$dieNumber, ", Player Pos: ", vals$playerpos[1], vals$playerpos[2])) ### DEBUG
     
     vals$boardstate <- checktile(currentrow, currentcol, isEvent) # Boardstates: -1: Dice, 0 Event, 1 Restaurant, 2 End
     if(vals$boardstate ==2) showModal(endModal())
@@ -282,19 +281,21 @@ server <- function(input, output, session) {####################################
   output$event <- reactive(vals$boardstate == 0)
   output$restaurant <- reactive(vals$boardstate == 1)
   for (outputpanel in c("dice", "event", "restaurant")) outputOptions(output, outputpanel, suspendWhenHidden=F)
-
+  
+  ### Restaurant Logic
   observeEvent(input$choosefood_yes,{
     allMenu <- getallMenu()
-    vals$calories <- vals$calories + allmenu[allmenu$Food == input$Chosenfood,"Calories"]
-    vals$hunger <- vals$hunger + allmenu[allmenu$Food == input$Chosenfood,"Hunger"]
+    newCalories <- allmenu[allmenu$Food == input$Chosenfood,"Calories"]
+    newHunger <- allmenu[allmenu$Food == input$Chosenfood,"Hunger"]
     
+    vals$calories <- vals$calories + newCalories
+    vals$hunger <- vals$hunger + newHunger
+    vals$action.log <- add_row(vals$action.log, Event=paste("Ate", input$Chosenfood), Calories=newCalories, Hunger=newHunger)
     vals$boardstate <- -1
   })
 
   ### Event logic
-  # Should observe for the user's position in the game == event tile's position
-   observe({
-  if (vals$boardstate==0){
+  observe({if (vals$boardstate==0){ # Should observe for the user's position in the game == event tile's position
     vals$QuestionNo <- getRandQuestionNo()
     
     output$EventPage1 <- renderUI({
@@ -305,17 +306,14 @@ server <- function(input, output, session) {####################################
                   label=getQuestionStatement(vals$QuestionNo),
                   choices = c("TRUE", "FALSE")),
       actionButton(inputId="checkbutton", label="Check!"))})
-  }
-})
-
+  }})
    
-#Pressed the check button
-  observeEvent(input$checkbutton,{
-    #Print statements
-    print(vals$QuestionNo)
-    print(input$selectedAns)
+  observeEvent(input$checkbutton, { #Pressed the check button
     #Check the user's ans
     outcome <- checkAnswer(vals$QuestionNo, input$selectedAns)
+    print(paste0("QuestionNo: ", vals$QuestionNo, 
+                 ", SelectedAns: ", input$selectedAns,
+                 ", Outcome: ",outcome))
     
     if (outcome==TRUE){
       #Tell them that they selected the correct answer
@@ -337,9 +335,8 @@ server <- function(input, output, session) {####################################
       tags$b("Answer is Correct! Press proceed to continue"),
       actionButton(inputId="proceedbutton", label="Proceed!"))})
       #Able to Proceed to Random Events page
-      
-  }else{
-     #Tell them that they selected the wrong answer
+    } else {
+      #Tell them that they selected the wrong answer
       #Change the button from Check to Proceed to Event
       #Close the current modal
       
@@ -359,20 +356,20 @@ server <- function(input, output, session) {####################################
       tags$b("Answer is Incorrect! Press proceed to continue"),
       actionButton(inputId="proceedbutton", label="Proceed!"))})
       #Able to Proceed to Random Events page    
-    
-  }
+    }
   })  
-  
-  
-  
+
   observeEvent(input$proceedbutton, {
     ##Randomly choose 1 event,
     vals$event_no <- sample(1:getMaxNumberOfEvents(), 1)
     
     #Should add in parts to modify Hunger, Calories.
-    vals$calories = vals$calories + getEventCalorie(vals$event_no)
-    vals$hunger = vals$hunger + getEventHunger(vals$event_no)
+    newCalories <- getEventCalorie(vals$event_no)
+    newHunger <- getEventHunger(vals$event_no)
     
+    vals$calories = vals$calories + newCalories
+    vals$hunger = vals$hunger + newHunger
+    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=newHunger)
     
     #Clear Page2
     output$EventPage2 <- renderUI(NULL)
@@ -384,25 +381,19 @@ server <- function(input, output, session) {####################################
       tags$h2(getEventDescription(vals$event_no)),
       actionButton(inputId="continuebutton", label="Continue")
     )}) 
-    
-    
-}
+  }
 )
+  
   observeEvent(input$continuebutton,{
     #Should go back to play the game, is it just this ???
     vals$boardstate <- -1
   })
 
-  ### TEMPORARY - End of game trigger
-  observeEvent(input$temp.lastTileTrigger, showModal(endModal()))
-
   ### endModal renders
   output$actionlog <- renderTable(vals$action.log)
-  output$leaderboard_endModal <- renderTable({ 
-    numclicks=input$name.done
-    getLeaderBoard()
-  })
-
+  output$leaderboard_endModal <- leaderBoard
+  output$leaderboard_publishedModal <- leaderBoard
+  
   ### Publish
   observeEvent(input$publish, showModal(nameModal())) # Get player name
   observeEvent(input$name.done, {
@@ -411,9 +402,7 @@ server <- function(input, output, session) {####################################
   })
 
   ### Quit correctly
-  # observeEvent(c(input$quit_endModal, input$quit_endModal, input$quit_pubishedModal), stopApp(), ignoreInit = T)
-  
-
+  observe(if(any(c(input$quit_endModal, input$quit_nameModal, input$quit_publishedModal)>0)) stopApp())
 }
 
 shinyApp(ui, server)

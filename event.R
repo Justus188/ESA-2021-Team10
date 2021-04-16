@@ -1,6 +1,5 @@
 library(shiny)
 library(shinybusy)
-library(DBI)
 library(tidyverse)
 
 source("lastTile.R")
@@ -10,7 +9,6 @@ getMaxNumberOfEvents <- function(){
   result <- getQuery(query)
   as.numeric(result[[1]])
 }
-
 
 getEventName <- function(event_no){
   query <- str_c("SELECT EventName FROM CarelorieEvents WHERE EventNumber=",event_no)
