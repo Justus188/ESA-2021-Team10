@@ -61,11 +61,10 @@ ui <- dashboardPage( ###########################################################
                      dashboardSidebar(
                        sidebarMenu(
                          id = "tabSelect",
-                         menuItem("Credits", tabName = "credits", icon=NULL),
                          menuItem("Welcome", tabName = "welcome", icon = icon("door-open")),
                          menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board")),
-                         menuItem("Leaderboard",tabName = "leaderboard", icon=icon("trophy"))
-                         
+                         menuItem("Leaderboard",tabName = "leaderboard", icon=icon("trophy")),
+                         menuItem("Credits", tabName = "credits", icon=icon("align-justify"))                        
                        )
                      ),
                      dashboardBody(
@@ -209,7 +208,8 @@ server <- function(input, output, session) {####################################
                          event_no = NULL,
                          boardstate = -1,
                          playerpos = c(9, 9), # (row,col) track token location; each edge has length 10 starting from (10,10), ends(9,10)
-                         action.log = data.frame(Event="Start", Calories=0, Hunger=2000))
+                         action.log = data.frame(Event="Start", Calories=0, Hunger=2000),
+                         turndiff = 0)
   
   ### WORK IN PROGRESS: TO SHIFT DOWN EVENTUALLY ###############################
   output$img1 <- renderUI({
@@ -283,24 +283,28 @@ server <- function(input, output, session) {####################################
   # })
   
   observeEvent(input$clickdie,{ #TODO: Implement a counter to click spam
-    vals$dieNumber = as.integer(runif(1,1,7))
-    vals$playerpos <- updateBoardState(vals$playerpos,vals$dieNumber)
-    vals$hunger <- vals$hunger - 100*vals$dieNumber
-    
-    if (vals$hunger<0) { #check for starving
-      showModal(starvingModal())
-      vals$calories <- vals$calories + 1500
-      vals$hunger <- vals$hunger + 1000
-      vals$action.log <- add_row(vals$action.log, Event="Binge ate due to hunger", Calories=1500, Hunger=1000)
+    if (vals$turndiff == 0){
+      vals$turndiff = vals$turndiff +1
+      vals$dieNumber = as.integer(runif(1,1,7))
+      vals$playerpos <- updateBoardState(vals$playerpos,vals$dieNumber)
+      vals$hunger <- vals$hunger - 100*vals$dieNumber
+      vals$action.log <- add_row(vals$action.log, Event=paste("Travelled", vals$dieNumber, "tiles", Calories = 0, Hunger = -100*vals$dieNumber))
+      
+      if (vals$hunger<0) { #check for starving
+        showModal(starvingModal())
+        vals$calories <- vals$calories + 1500
+        vals$hunger <- vals$hunger + 1000
+        vals$action.log <- add_row(vals$action.log, Event="Binge ate due to hunger", Calories=1500, Hunger=1000)
+      }
+      
+      currentrow <- vals$playerpos[1]
+      currentcol <- vals$playerpos[2]
+      
+      print(paste0("Die rolled: ", vals$dieNumber, ", Player Pos: ", vals$playerpos[1], vals$playerpos[2])) ### DEBUG
+      
+      vals$boardstate <- checktile(currentrow, currentcol, isEvent) # Boardstates: -1: Dice, 0 Event, 1 Restaurant, 2 End
+      if(vals$boardstate ==2) showModal(endModal())
     }
-    
-    currentrow <- vals$playerpos[1]
-    currentcol <- vals$playerpos[2]
-    
-    print(paste0("Die rolled: ", vals$dieNumber, ", Player Pos: ", vals$playerpos[1], vals$playerpos[2])) ### DEBUG
-    
-    vals$boardstate <- checktile(currentrow, currentcol, isEvent) # Boardstates: -1: Dice, 0 Event, 1 Restaurant, 2 End
-    if(vals$boardstate ==2) showModal(endModal())
   })
   
   output$dice <- reactive(vals$boardstate == -1)
@@ -318,6 +322,7 @@ server <- function(input, output, session) {####################################
     vals$hunger <- vals$hunger + newHunger
     vals$action.log <- add_row(vals$action.log, Event=paste("Ate", input$Chosenfood), Calories=newCalories, Hunger=newHunger)
     vals$boardstate <- -1
+    vals$turndiff <- vals$turndiff -1
   })
   
   ### Event logic
@@ -413,6 +418,7 @@ server <- function(input, output, session) {####################################
   observeEvent(input$continuebutton,{
     #Should go back to play the game, is it just this ???
     vals$boardstate <- -1
+    vals$turndiff <- vals$turndiff -1
   })
   
   ### endModal renders

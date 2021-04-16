@@ -57,34 +57,6 @@ menuModal <- function(failed = FALSE){
 
 checktile <- function(row, col, isEvent) if (isEvent[row+1, col+1]) 0 else if (row==8 && col == 9) 2 else 1
 
-
-getSingleStepLocation <- function(gridrow,gridcol,gridsize){
-  
-  # We assume that the direction is clockwise
-  newgridrow <- gridrow
-  newgridcol <- gridcol
-  if (gridrow==gridsize){
-    if (gridcol>1){
-      newgridcol <- gridcol-1
-    } else newgridrow <- gridrow-1
-  }else{if (gridrow==1){
-    if (gridcol<gridsize){
-      newgridcol <- gridcol+1
-    } else newgridrow <- gridrow+1
-  }else {# gridrow is neither 1 nor GRIDSIZE
-    if (gridcol==gridsize){
-      newgridrow <- gridrow+1
-    } else { # Assume gridcol==1
-      newgridrow <- gridrow-1
-    }
-  }
-  }
-  newlocation <- list(row=newgridrow,col=newgridcol)
-  newlocation
-}
-
-
-
 updateBoardState <- function(playerpos,dieNumber){
   row <- playerpos[1]
   col <- playerpos[2]
