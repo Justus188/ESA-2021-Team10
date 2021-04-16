@@ -93,9 +93,9 @@ ui <- dashboardPage(
                                         tags$h1("Menu"), # change the food names to random 5 food names from database
                                         selectInput(inputId = "Chosenfood", 
                                                     label = "Please choose something:",   
-                                                    c( food1name , food2name , food3name , food4name , food5name  )
+                                                    getMenu()[,2]
                                         ),
-                                        uiOutput("img1"), textOutput("foodingredients"), 
+                                        uiOutput("foodimg"), textOutput("foodingredients"), 
                                         textOutput("fillinglevel"),
                                         actionButton("choosefood_yes","ok"),
                                         actionButton("choosefood_no","cancel")
@@ -234,11 +234,12 @@ server <- function(input, output, session) {
   for (outputpanel in c("dice", "event", "restaurant")) outputOptions(output, outputpanel, suspendWhenHidden=F)
 
   observeEvent(input$choosefood_yes,{
-    input$Chosenfood
-    vals$calories <- vals$calories + restaurantmenu[restaurantmenu$menuitem == input$menuitem,2]
-    vals$hunger <- vals$hunger + restaurantmenu[restaurantmenu$menuitem == input$menuitem,3]
-    print(vals$calories)
-    print(vals$hunger)
+    vals$calories <- vals$calories + getallMenu()[getallMenu()$Food == input$Chosenfood,"Calories"]
+    vals$hunger <- vals$hunger + getallMenu()[getallMenu()$Food == input$Chosenfood,"Hunger"]
+    #print(vals$calories)
+    #print(vals$hunger)
+    
+    vals$boardstate <- -1
   })
   
   ### TEMPORARY - Starving test
