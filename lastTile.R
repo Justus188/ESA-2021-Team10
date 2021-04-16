@@ -43,7 +43,7 @@ endModal <- function() {modalDialog(
   "Congratulations! Here is a summary of what you ate this run!",
   tableOutput("actionlog"),
   "Here's how other players did!",
-  tableOutput("leaderboard"),
+  tableOutput("leaderboard_endModal"),
   footer = tagList(
     actionButton("quit_endModal", "Quit"),
     actionButton("start_endModal", "Restart"),
@@ -64,7 +64,7 @@ nameModal <- function(){modalDialog(
 publishedModal <- function(){modalDialog(
   title = "Your score has been published!",
   "Your score has been published! Do you see it in the leaderboard?",
-  tableOutput("leaderboard"),
+  tableOutput("leaderboard,"),
   footer = tagList(
     actionButton("quit_publishedModal", "Quit"),
     actionButton("start_publishedModal", "Restart")
