@@ -212,11 +212,11 @@ server <- function(input, output, session) {
     #vals$dieNumber <- 1 # For testing set the dieNumber to 1
     vals$playerpos <- updateBoardState(vals$playerpos,vals$dieNumber, GRIDSIZE)
     
-    vals$hunger <- vals$hunger - vals$dieNumber     #omitted hunger alteration for testing
+    vals$hunger <- vals$hunger - 100*vals$dieNumber     #omitted hunger alteration for testing
     if (vals$hunger<0) { #check for starving
       showModal(starvingModal())
-      vals$calories <- vals$calories + 3000
-      vals$hunger <- vals$hunger + 30
+      vals$calories <- vals$calories + 1500
+      vals$hunger <- vals$hunger + 1000
     }
     
     currentrow <- vals$playerpos[1]
