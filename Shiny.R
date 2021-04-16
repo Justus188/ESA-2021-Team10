@@ -57,99 +57,125 @@ renderCell <- function(playerpos, cellid, input, isEvent){
 }
 
 ui <- dashboardPage( ###########################################################
-    dashboardHeader(title = "CARElorie"),
-    dashboardSidebar(
-        sidebarMenu(
-            id = "tabSelect",
-            menuItem("Welcome", tabName = "welcome", icon = icon("door-open")),
-            menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board")),
-            menuItem("Leaderboard",tabName = "leaderboard", icon=icon("trophy"))
-        )
-    ),
-    dashboardBody(
-        tabItems(
-            tabItem(tabName = "welcome",
-                    h1("Welcome to CARElorie!"),
-                    h2("Start the game by choosing your player token and clicking on the Start button!"),
-                    tags$br(),
-                    selectInput("playertoken", "Select your player token:",c("Burger","Fries","Apple")),
-                    uiOutput("playertokenimg"),
-                    tags$h4("Instructions"),
-                    tags$p(" INSERT INSTRUCTIONS "), #TODO: Update this
-                    actionButton("start_welcome", "Start the Game!"),
-                    
-                    ### Temp Stuff
-                    actionButton("temp.lastTileTrigger", "Last Tile"),
-                    actionButton("temp.eventTrigger", label="Land on Event"),
-                    actionButton("testmenu","TestMenu"),
-                    actionButton("teststarving","TestStarving"),
-                    textOutput("testvar")
-            ),
-            tabItem(tabName = "gameboard",
-                    h2("CARElorie"),
-                    h2("Start the game by clicking the die on the right"),
-                    sidebarLayout( 
-                        # the trick here is to make the gameboard image 'position:absolute;z-order:0'; 
-                        # Then, to superimpose images, style them to be 'position:relative;z-order:999'
-                        mainPanel(width=10,
-                                  img(src='board.png',style="position:absolute;z-order:0",width="525px",height="505px"),
-                                  createRow(0), tags$br(),
-                                  createRow(1), tags$br(),
-                                  createRow(2), tags$br(),
-                                  createRow(3), tags$br(),
-                                  createRow(4), tags$br(),
-                                  createRow(5), tags$br(),
-                                  createRow(6), tags$br(),
-                                  createRow(7), tags$br(),
-                                  createRow(8), tags$br(),
-                                  createRow(9), tags$br()),
-                        sidebarPanel( width = 2,
-                                      "Hunger Meter:",
-                                      imageOutput("hunger_scale", height = "100px", width = "100px"),
-                                      # only show this panel if player is rolling the die
-                                      conditionalPanel(
-                                          condition = "output.dice == true",
-                                          "Click on the dice to roll for your movement this turn!",
-                                          imageOutput("die",height="100px",width="100px",click=clickOpts("clickdie", clip=F),inline=TRUE)
-                                      ),
-                                      
-                                      # Only show this panel if land on restaurant tile
-                                      conditionalPanel(
-                                        condition = "output.restaurant == true",
-                                        tags$h1("Menu"), # change the food names to random 5 food names from database
-                                        selectInput(inputId = "Chosenfood", 
-                                                    label = "Please choose something:",   
-                                                    getMenu()[,"Food"]
-                                        ),
-                                        uiOutput("foodimg"), textOutput("foodingredients"), 
-                                        textOutput("fillinglevel"),
-                                        actionButton("choosefood_yes","ok"),
-                                        actionButton("choosefood_no","cancel")
-                                      ),
-                                      
-                                      # Only show this panel if land on event
-                                      conditionalPanel(
-                                        condition = "output.event == true",
-                                        fluidPage(     
-                                          uiOutput("EventPage1"),
-                                          uiOutput("EventPage2"),
-                                          uiOutput("EventPage3")
-                                        )
-                                      )
-                        )
-                    )
-            ),
-            tabItem(tabName = "leaderboard", 
-                    h2("Hall of Fame"),
-                    box(
-                      title = "See where you stand!",width=12,
-                      tableOutput("leaderboard"),
-                      "Not here? Play again!",
-                      actionButton("start_leaderboard", "Start the Game!")
-                    )
-            )
-        )
-    ))
+                     dashboardHeader(title = "CARElorie"),
+                     dashboardSidebar(
+                       sidebarMenu(
+                         id = "tabSelect",
+                         menuItem("Credits", tabName = "credits", icon=NULL),
+                         menuItem("Welcome", tabName = "welcome", icon = icon("door-open")),
+                         menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board")),
+                         menuItem("Leaderboard",tabName = "leaderboard", icon=icon("trophy"))
+                         
+                       )
+                     ),
+                     dashboardBody(
+                       tabItems(
+                         tabItem(tabName = "welcome",
+                                 h1("Welcome to CARElorie!"),
+                                 h2("Start the game by choosing your player token and clicking on the Start button!"),
+                                 tags$br(),
+                                 selectInput("playertoken", "Select your player token:",c("Burger","Fries","Apple")),
+                                 uiOutput("playertokenimg"),
+                                 tags$h4("Instructions"),
+                                 tags$p(" INSERT INSTRUCTIONS "), #TODO: Update this
+                                 actionButton("start_welcome", "Start the Game!"),
+                                 
+                                 ### Temp Stuff
+                                 actionButton("temp.lastTileTrigger", "Last Tile"),
+                                 actionButton("temp.eventTrigger", label="Land on Event"),
+                                 actionButton("testmenu","TestMenu"),
+                                 actionButton("teststarving","TestStarving"),
+                                 textOutput("testvar")
+                         ),
+                         tabItem(tabName = "gameboard",
+                                 h2("CARElorie"),
+                                 h2("Start the game by clicking the die on the right"),
+                                 sidebarLayout( 
+                                   # the trick here is to make the gameboard image 'position:absolute;z-order:0'; 
+                                   # Then, to superimpose images, style them to be 'position:relative;z-order:999'
+                                   mainPanel(width=10,
+                                             img(src='board.png',style="position:absolute;z-order:0",width="525px",height="505px"),
+                                             createRow(0), tags$br(),
+                                             createRow(1), tags$br(),
+                                             createRow(2), tags$br(),
+                                             createRow(3), tags$br(),
+                                             createRow(4), tags$br(),
+                                             createRow(5), tags$br(),
+                                             createRow(6), tags$br(),
+                                             createRow(7), tags$br(),
+                                             createRow(8), tags$br(),
+                                             createRow(9), tags$br()),
+                                   sidebarPanel( width = 2,
+                                                 "Hunger Meter:",
+                                                 imageOutput("hunger_scale", height = "100px", width = "100px"),
+                                                 # only show this panel if player is rolling the die
+                                                 conditionalPanel(
+                                                   condition = "output.dice == true",
+                                                   "Click on the dice to roll for your movement this turn!",
+                                                   imageOutput("die",height="100px",width="100px",click=clickOpts("clickdie", clip=F),inline=TRUE)
+                                                 ),
+                                                 
+                                                 # Only show this panel if land on restaurant tile
+                                                 conditionalPanel(
+                                                   condition = "output.restaurant == true",
+                                                   tags$h1("Menu"), # change the food names to random 5 food names from database
+                                                   selectInput(inputId = "Chosenfood", 
+                                                               label = "Please choose something:",   
+                                                               getMenu()[,"Food"]
+                                                   ),
+                                                   uiOutput("foodimg"), textOutput("foodingredients"), 
+                                                   textOutput("fillinglevel"),
+                                                   actionButton("choosefood_yes","ok"),
+                                                   actionButton("choosefood_no","cancel")
+                                                 ),
+                                                 
+                                                 # Only show this panel if land on event
+                                                 conditionalPanel(
+                                                   condition = "output.event == true",
+                                                   fluidPage(     
+                                                     uiOutput("EventPage1"),
+                                                     uiOutput("EventPage2"),
+                                                     uiOutput("EventPage3")
+                                                   )
+                                                 )
+                                   )
+                                 )
+                         ),
+                         tabItem(tabName = "leaderboard", 
+                                 h2("Hall of Fame"),
+                                 box(
+                                   title = "See where you stand!",width=12,
+                                   tableOutput("leaderboard"),
+                                   "Not here? Play again!",
+                                   actionButton("start_leaderboard", "Start the Game!")
+                                 )
+                         ),
+                         #image sources tab         
+                         tabItem(tabName = "credits",
+                                 h1("Image Sources:"),
+                                 h2("Dice"),
+                                 h5("http://creativecommons.org/licenses/by-sa/3.0/"),
+                                 h2("Tokens"),
+                                 h5("https://www.freepik.com"),
+                                 h2("Restaurant"),
+                                 tags$div("https://www.cookist.com/youtiao-recipe-a-delicious-chinese-fried-dough/", tags$br(),
+                                          "https://singaporelocalfavourites.com/yong-tau-foo-meat-paste-stock-and-method.htmlhttps://tasteasianfood.com/taro-cake/", tags$br(),
+                                          "https://www.angsarap.net/2016/08/26/watercress-pork-rib-soup/", tags$br(),
+                                          "https://asianinspirations.com.au/recipes/cantonese-wonton-noodle-soup/", tags$br(),
+                                          "https://www.nyonyacooking.com/recipes/wonton-noodles~SJ-yOPiDzqW7", tags$br(),
+                                          "https://www.lemonblossoms.com/blog/thai-tom-yum-soup-hot-and-sour-soup/", tags$br(),
+                                          "https://whattocooktoday.com/tau-suan.html", tags$br(),
+                                          "https://www.foodiecrush.com/my-moms-homemade-spaghetti-and-meat-sauce/", tags$br(),
+                                          "https://mcdonalds.com.au/menu/spicy-chicken-mcwrap", tags$br(),
+                                          "https://eatwhattonight.com/2016/08/soon-kueh/", tags$br(),
+                                          "https://www.recipetineats.com/siu-mai-shumai-steamed-dumplings/", tags$br(),
+                                          "https://www.hungrygowhere.com/singapore/the_roti_prata_house/photo/c8760000", tags$br(),
+                                          "https://www.todayonline.com/singapore/jail-third-man-involved-attack-prata-stall-cook", tags$br(),
+                                          "https://www.kuali.com/recipe/hari-raya/roti-john/")
+                                 
+                         )
+                       )
+                     ))
 
 server <- function(input, output, session) {####################################
   ### TEMPORARY Triggers #######################################################
@@ -165,17 +191,17 @@ server <- function(input, output, session) {####################################
   })
   
   observeEvent(input$temp.lastTileTrigger, showModal(endModal()))
-
+  
   output$testvar <- NULL
   
   ### Init #####################################################################
-
+  
   allmenu <- getallMenu() #df with all menu items
   leaderBoard <- renderTable({input$name.done; getLeaderBoard()}) #pregenerate leaderboard for use in multiple screens
   
   ### Regenerate on new game # Shift to start() later ##########################
   isEvent <- matrix(runif(100, 0,1) <0.2, byrow=T, nrow=10) # matrix[row+1, col+1] of isEvent tile
-
+  
   vals <- reactiveValues(calories = 0,
                          hunger = 2000,
                          dieNumber = 6,
@@ -230,7 +256,7 @@ server <- function(input, output, session) {####################################
   ### RENDERING FUNCTIONS ######################################################
   # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
   output$playertokenimg <- renderUI(img(src = getTokenSrc(input), height=50, width=50))
-
+  
   observe({vals$playerpos
     mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input, isEvent)}, x=listofcells, y=genCellIds())
   })
@@ -293,21 +319,21 @@ server <- function(input, output, session) {####################################
     vals$action.log <- add_row(vals$action.log, Event=paste("Ate", input$Chosenfood), Calories=newCalories, Hunger=newHunger)
     vals$boardstate <- -1
   })
-
+  
   ### Event logic
   observe({if (vals$boardstate==0){ # Should observe for the user's position in the game == event tile's position
     vals$QuestionNo <- getRandQuestionNo()
     
     output$EventPage1 <- renderUI({
       tagList(
-      tags$h1("Event"),
-      #Show randomly generated question 
-      radioButtons(inputId="selectedAns",
-                  label=getQuestionStatement(vals$QuestionNo),
-                  choices = c("TRUE", "FALSE")),
-      actionButton(inputId="checkbutton", label="Check!"))})
+        tags$h1("Event"),
+        #Show randomly generated question 
+        radioButtons(inputId="selectedAns",
+                     label=getQuestionStatement(vals$QuestionNo),
+                     choices = c("TRUE", "FALSE")),
+        actionButton(inputId="checkbutton", label="Check!"))})
   }})
-   
+  
   observeEvent(input$checkbutton, { #Pressed the check button
     #Check the user's ans
     outcome <- checkAnswer(vals$QuestionNo, input$selectedAns)
@@ -324,16 +350,16 @@ server <- function(input, output, session) {####################################
       
       #Set up EventPage2
       output$EventPage2 <- renderUI({
-      tagList(
-      tags$h1("Event"),
-      #Show randomly generated question 
-      radioButtons(inputId="selectedAns",
-                  label=getQuestionStatement(vals$QuestionNo),
-                  choices = c("TRUE", "FALSE")),
-      tags$b(getQuestionExplanation(vals$QuestionNo)),
-      br(),
-      tags$b("Answer is Correct! Press proceed to continue"),
-      actionButton(inputId="proceedbutton", label="Proceed!"))})
+        tagList(
+          tags$h1("Event"),
+          #Show randomly generated question 
+          radioButtons(inputId="selectedAns",
+                       label=getQuestionStatement(vals$QuestionNo),
+                       choices = c("TRUE", "FALSE")),
+          tags$b(getQuestionExplanation(vals$QuestionNo)),
+          br(),
+          tags$b("Answer is Correct! Press proceed to continue"),
+          actionButton(inputId="proceedbutton", label="Proceed!"))})
       #Able to Proceed to Random Events page
     } else {
       #Tell them that they selected the wrong answer
@@ -345,20 +371,20 @@ server <- function(input, output, session) {####################################
       
       #Set up EventPage2
       output$EventPage2 <- renderUI({
-      tagList(
-      tags$h1("Event"),
-      #Show randomly generated question 
-      radioButtons(inputId="selectedAns",
-                  label=getQuestionStatement(vals$QuestionNo),
-                  choices = c("TRUE", "FALSE")),
-      tags$b(getQuestionExplanation(vals$QuestionNo)),
-      br(),
-      tags$b("Answer is Incorrect! Press proceed to continue"),
-      actionButton(inputId="proceedbutton", label="Proceed!"))})
+        tagList(
+          tags$h1("Event"),
+          #Show randomly generated question 
+          radioButtons(inputId="selectedAns",
+                       label=getQuestionStatement(vals$QuestionNo),
+                       choices = c("TRUE", "FALSE")),
+          tags$b(getQuestionExplanation(vals$QuestionNo)),
+          br(),
+          tags$b("Answer is Incorrect! Press proceed to continue"),
+          actionButton(inputId="proceedbutton", label="Proceed!"))})
       #Able to Proceed to Random Events page    
     }
   })  
-
+  
   observeEvent(input$proceedbutton, {
     ##Randomly choose 1 event,
     vals$event_no <- sample(1:getMaxNumberOfEvents(), 1)
@@ -377,18 +403,18 @@ server <- function(input, output, session) {####################################
     #Set up Page3
     output$EventPage3 <- renderUI({
       tagList(
-      tags$h2(getEventName(vals$event_no)),
-      tags$h2(getEventDescription(vals$event_no)),
-      actionButton(inputId="continuebutton", label="Continue")
-    )}) 
+        tags$h2(getEventName(vals$event_no)),
+        tags$h2(getEventDescription(vals$event_no)),
+        actionButton(inputId="continuebutton", label="Continue")
+      )}) 
   }
-)
+  )
   
   observeEvent(input$continuebutton,{
     #Should go back to play the game, is it just this ???
     vals$boardstate <- -1
   })
-
+  
   ### endModal renders
   output$actionlog <- renderTable(vals$action.log)
   output$leaderboard_endModal <- leaderBoard
@@ -400,7 +426,7 @@ server <- function(input, output, session) {####################################
     publishScore(input$name.name, vals$calories)
     showModal(publishedModal())
   })
-
+  
   ### Quit correctly
   observe(if(any(c(input$quit_endModal, input$quit_nameModal, input$quit_publishedModal)>0)) stopApp())
 }
