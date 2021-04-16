@@ -9,24 +9,32 @@
 
 library(shiny)
 library(shinydashboard)
+library(tidyverse)
 
+source("lastTile.R")
 getallMenu <- function(){
+
   #extract a df of all menu items
+  query <- "SELECT * FROM CarelorieMenu"
+  allmenu <- getQuery(query)
   
-  restaurantmenu <- data.frame(menuitem = c("Choose Something","fish","chicken","beef","None"),calories = c(NA,100,200,300,0), hungereffect = c(NA,1,1,1,1))
-  restaurantmenu
+  allmenu
 }
+
+
 
 getMenu <- function(){
   # Extract random menu from database
+  allmenu <- getallMenu()
+  foodtype <- unique(allmenu$Foodtype)
+  selectedfoodtype <- sample(foodtype,1)
+  query <- paste0("SELECT * FROM CarelorieMenu WHERE Foodtype = '" ,selectedfoodtype,"' ORDER BY RAND() LIMIT 5")
+  selectedmenu <- getQuery(query)
   
-  # output will be dataframe containing menuitem,calories,hungereffect and append a none option and null option, and taken from a random food type of the total menu
-  #test menu
-  restaurantmenu <- data.frame(menuitem = c("Choose Something","fish","chicken","beef","None"),
-                               calories = c(NA,100,200,300,0), hungereffect = c(NA,1,1,1,1))
-  restaurantmenu
+  selectedmenu <- rbind(selectedmenu,c(0,"Nothing","Nothing",0,0,"Blank.png"))
   
 }
+
 
 
 starvingModal <- function(){
