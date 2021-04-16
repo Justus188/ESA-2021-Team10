@@ -23,11 +23,15 @@ food3_ingredients = "Chicken fillet, lettuce, buns"          # for testing
 food4_ingredients = "Beef patty, cheese, pickles, buns"      # for testing
 food5_ingredients = "Grilled chicken, lettuce, tortilla"     # for testing
 
+GRIDSIZE <- 10
+
+createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="70px", width = "70px", inline = T))
+createRow <- function(i) return(lapply(0:9, createTile, i = i))
+
 ui <- dashboardPage(
     dashboardHeader(title = "CARElorie"),
     dashboardSidebar(
         sidebarMenu(
-            #https://fontawesome.com/icons?d=gallery
             id = "tabSelect",
             menuItem("Welcome", tabName = "welcome", icon = icon("door-open")),
             menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board")),
@@ -51,74 +55,62 @@ ui <- dashboardPage(
                     actionButton("temp.eventTrigger", label="Land on Event"),
                     actionButton("testmenu","TestMenu"),
                     actionButton("teststarving","TestStarving")
-                    
+                    ,textOutput("testvar")
             ),
             
             # Second tab content
             tabItem(tabName = "gameboard",
-                    #h2("CARElorie"),
-                    #h2("Start the game by clicking the die on the right"),
-                    fluidRow(
-                        #title = "A Very Simple Board Game",width=12,
-                        #htmlOutput("playercolorchoice"),
+                    h2("CARElorie"),
+                    h2("Start the game by clicking the die on the right"),
+                    sidebarLayout( 
                         # the trick here is to make the gameboard image 'position:absolute;z-order:0'; 
                         # Then, to superimpose images, style them to be 'position:relative;z-order:999'
-                        
-                        sidebarLayout( 
-                            mainPanel(width=9,box(img(src='board.png',style="position:absolute;z-order:0",width="920px",height="550px"),
-                                          imageOutput("cell11",height="100px",width="100px",click="click11",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell12",height="100px",width="100px",click="click12",inline=TRUE),  # height and width are for the containing div, not the image itself
-                                          imageOutput("cell13",height="100px",width="100px",click="click13",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell14",height="100px",width="100px",click="click14",inline=TRUE),  # height and width are for the containing div, not the image itself
-                                          tags$br(),
-                                          imageOutput("cell21",height="100px",width="100px",click="click21",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell22",height="100px",width="100px",click="click22",inline=TRUE),  # height and width are for the containing div, not the image itself
-                                          imageOutput("cell23",height="100px",width="100px",click="click23",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell24",height="100px",width="100px",click="click24",inline=TRUE),  # height and width are for the containing div, not the image itself
-                                          tags$br(),
-                                          imageOutput("cell31",height="100px",width="100px",click="click31",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell32",height="100px",width="100px",click="click32",inline=TRUE),  # height and width are for the containing div, not the image itself
-                                          imageOutput("cell33",height="100px",width="100px",click="click33",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell34",height="100px",width="100px",click="click34",inline=TRUE),  # height and width are for the containing div, not the image itself
-                                          tags$br(),
-                                          imageOutput("cell41",height="100px",width="100px",click="click41",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell42",height="100px",width="100px",click="click42",inline=TRUE),  # height and width are for the containing div, not the image itself
-                                          imageOutput("cell43",height="100px",width="100px",click="click43",inline=TRUE), # height and width are for the containing div, not the image itself
-                                          imageOutput("cell44",height="100px",width="100px",click="click44",inline=TRUE),  # height and width are for the containing div, not the image itself
-                            )),
-                            
-                            sidebarPanel( width = 3,
-                                          selectInput("r_or_e", label = "Player lands on:", c("movement","event","restaurant")),
-                                          # only show this panel if player is rolling the die
-                                          conditionalPanel(
-                                              condition = "input.r_or_e == 'movement'",
-                                              uiOutput("hunger_scale"),
-                                              imageOutput("die",height="410px",width="410px",click="clickdie",inline=TRUE)
-                                          ),
-                                          
-                                          # Only show this panel if land on restaurant tile
-                                conditionalPanel(
-                                  condition = "input.r_or_e == 'restaurant'",
-                                  tags$h1("Menu"), # change the food names to random 5 food names from database
-                                  selectInput( inputId = "Chosenfood", label = "Please choose something:",   
-                                               c( food1name , food2name , food3name , food4name , food5name  )
-                                  ), uiOutput("img1"), textOutput("foodingredients"), textOutput("fillinglevel"),actionButton("choosefood_yes","ok"),actionButton("choosefood_no","cancel")
+                        # TODO: Change sizes of cells; gridsize = 10
+                        mainPanel(width=10,
+                                  img(src='board.png',style="position:absolute;z-order:0",width="820px",height="800px"),
+                                  createRow(0), tags$br(),
+                                  createRow(1), tags$br(),
+                                  createRow(2), tags$br(),
+                                  createRow(3), tags$br(),
+                                  createRow(4), tags$br(),
+                                  createRow(5), tags$br(),
+                                  createRow(6), tags$br(),
+                                  createRow(7), tags$br(),
+                                  createRow(8), tags$br(),
+                                  createRow(9), tags$br()),
+                        sidebarPanel( width = 2,
+                                      selectInput("r_or_e", label = "Player lands on:", c("movement","event","restaurant")),
+                                      # only show this panel if player is rolling the die
+                                      conditionalPanel(
+                                          condition = "output.dice == true",
+                                          uiOutput("hunger_scale"),
+                                          imageOutput("die",height="410px",width="410px",click="clickdie",inline=TRUE)
+                                      ),
+                                      
+                                      # Only show this panel if land on restaurant tile
+                                      conditionalPanel(
+                                        condition = "output.restaurant == true",
+                                        tags$h1("Menu"), # change the food names to random 5 food names from database
+                                        selectInput(inputId = "Chosenfood", 
+                                                    label = "Please choose something:",   
+                                                    c( food1name , food2name , food3name , food4name , food5name  )
+                                        ),
+                                        uiOutput("img1"), textOutput("foodingredients"), 
+                                        textOutput("fillinglevel"),
+                                        actionButton("choosefood_yes","ok"),
+                                        actionButton("choosefood_no","cancel")
+                                      ),
+                                      # Only show this panel if land on event
+                                      conditionalPanel(
+                                          condition = "output.event == true",
+                                          fluidRow(column(4, offset = 3,
+                                                          tags$h1("Event")
+                                                   ),
                                           )
-                                          ,
-                                          # Only show this panel if land on event
-                                          conditionalPanel(
-                                              condition = "input.r_or_e == 'event'",
-                                              fluidRow(column(4, offset = 3,
-                                                              tags$h1("Event")),
-                                                       
-                                              )
-                                              
-                                          )
-                            ))
-                        
-                    )
+                                        )
+                            )
+                        )
             ),
-            
             tabItem(tabName = "leaderboard", 
                     h2("Publish Your Score"),
                     fluidRow(
@@ -137,23 +129,11 @@ ui <- dashboardPage(
     ))
 
 server <- function(input, output, session) {
-  ### Global variables (ewww)
-  # VARIANTMONOPOLY <- 1
-  # REDTURN <- 0
-  # BLUETURN <- 1
-  CELLEMPTY <- 1
-  CELLRED <- 2
-  # CELLBLUE <- 3
-  # CELLBOTH <- 4
-  GRIDSIZE <- 4
-
-  pieces <- matrix(rep(CELLEMPTY,GRIDSIZE*GRIDSIZE),nrow=GRIDSIZE,ncol=GRIDSIZE,byrow=TRUE)
-  #starting position of player
-  pieces[2,1] <- CELLRED
+  
+  
   #df containing all menuitems
   allmenu <- getallMenu()
-  #list containing coordinates in the form of paste(row,col) to check if player is on event tile
-  eventlist <- list()
+  isEvent <- matrix(runif(100, 0,1) <0.2, byrow=T, nrow=10) # matrix[row+1, col+1] of isEvent tile
 
   ### Initialise reactive values
   #boardstate represents movement,event,restaurant,last tile using NULL,0,1,2 respectively
@@ -161,34 +141,117 @@ server <- function(input, output, session) {
                          hunger = 10,
                          dieNumber = 2,
                          QuestionNo = NULL,
-                         boardstate = NULL,
+                         boardstate = -1,
+                         playerpos = c(9, 9), # (row,col) track token location; each edge has length 10 starting from (10,10), ends(9,10)
                          action.log = data.frame(Food="Burger", Calories=as.integer(10), Hunger = "+10"))
-
-  ### MODULES TO BE ADDED - Start the game
+  
+  output$testvar <- reactive({
+    print(vals$playerpos)
+    print(vals$dieNumber)})
+  
+  ### RENDERING FUNCTIONS
+  renderCell <- function(playerpos, cellid, input){
+    # Renders token if occupied, else empty
+    row <- as.integer(substr(cellid, 1,1))
+    col <- as.integer(substr(cellid, 2,2))
+    
+    renderImage({
+      imgsrc <- "www/token2.png" #Blank
+      if ((row %in% c(0,9)) || (col %in% c(0,9))) {
+        if(playerpos[1] == row && playerpos[2] == col) {
+          imgsrc <- paste0("www/",getTokenSrc(input))
+        } else if (isEvent[row+1, col+1]){
+          #some event picture
+          imgsrc <- "www/token3.png"
+        }
+      }
+      
+      imgstyle <-  getImageStyle() # style the image (add a border) to convey other information such as allowable moves
+      
+      # Unfortunately, we are not able to re-size the image and still have the click event work.
+      # So the image files must have exactly the size we want.
+      # Also, z-order works only if 'position' is set.
+      list(src=imgsrc,style="position:relative;z-order:999;")
+      
+    },deleteFile=FALSE)
+  }
+  
+  genCellIds <- function(){
+    initIds = as.character(0:99)
+    initIds[1:10] <- paste0("0", initIds[1:10])
+    initIds
+  }
+  listofcells = lapply(genCellIds(), function(x) return(paste0("cell", x)))
+  observe({
+    dummy <- vals$playerpos + 1
+    mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input)}, x=listofcells, y=genCellIds())
+    })
+  
+  output$die <- renderImage({
+    #select the icon appropriate for this die
+    imageid <- vals$dieNumber
+    imgsrc=switch(imageid,"www/Die1.png","www/Die2.png","www/Die3.png","www/Die4.png","www/Die5.png","www/Die6.png")
+    # Unfortunately, we are not able to re-size the image and still have the click event work.
+    # So the image files must have exactly the size we want.
+    # Also, z-order works only if 'position' is set.
+    list(src=imgsrc,style="position:relative;z-order:999;")
+  },deleteFile=FALSE)
+  
+  # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
+  output$playertokenimg <- renderUI({img(src = getTokenSrc(input), height=50, width=50)})
+  
+  ### GAME LOGIC ###############################################################
   observeEvent(input$start, {
     updateTabItems(session, "tabSelect", "gameboard")
     print("Starting game")
   }) #Insert start game code here
     ## update the playertoken image that the player chose 
+  
+  observeEvent(input$clickdie,{
+    # change turn using mod operator
+    # vals$playerturn <- (vals$playerturn+1) %% 2
+    # generate a random number between 1 and 7 and then truncate to an integer to get a random die number
+    vals$dieNumber = as.integer(runif(1,1,7))
+    #vals$dieNumber <- 1 # For testing set the dieNumber to 1
+    vals$playerpos <- updateBoardState(vals$playerpos,vals$dieNumber, GRIDSIZE)
     
-  ### MODULES TO BE ADDED - Game body goes here
-  output$gameboard <- renderImage(NULL)
+    vals$hunger <- vals$hunger - vals$dieNumber     #omitted hunger alteration for testing
+    if (vals$hunger<0) { #check for starving
+      showModal(starvingModal())
+      vals$calories <- vals$calories + 3000
+      vals$hunger <- vals$hunger + 30
+    }
+    
+    currentrow <- vals$playerpos[1]
+    currentcol <- vals$playerpos[2]
+    
+    vals$boardstate <- checktile(currentrow, currentcol, isEvent)
+    # Boardstates: -1: Dice, 0 Event, 1 Restaurant, 2 End
+    if(vals$boardstate ==2) showModal(endModal())
+  })
+  
+  ### Dynamic sidepanel ########################################################
+  output$dice <- reactive(vals$boardstate == -1)
+  output$event <- reactive(vals$boardstate == 0)
+  output$restaurant <- reactive(vals$boardstate == 1)
+  for (outputpanel in c("dice", "event", "restaurant")) outputOptions(output, outputpanel, suspendWhenHidden=F)
 
+  observeEvent(input$choosefood_yes,{
+    input$Chosenfood
+    vals$calories <- vals$calories + restaurantmenu[restaurantmenu$menuitem == input$menuitem,2]
+    vals$hunger <- vals$hunger + restaurantmenu[restaurantmenu$menuitem == input$menuitem,3]
+    print(vals$calories)
+    print(vals$hunger)
+  })
+  
   ### TEMPORARY - Starving test
   observeEvent(input$teststarving, showModal(starvingModal()))
   observeEvent(input$starvingok, removeModal())
 
   ### TEMPORARY - Menu test
   observeEvent(input$testmenu, showModal(menuModal()))
-  observeEvent(input$menuok,{
-    if (input$menuitem == "Choose Something") {showModal(menuModal(failed = TRUE))} else {
-      vals$calories <- vals$calories + restaurantmenu[restaurantmenu$menuitem == input$menuitem,2]
-      vals$hunger <- vals$hunger + restaurantmenu[restaurantmenu$menuitem == input$menuitem,3]
-      print(vals$calories)
-      print(vals$hunger)
-      removeModal()
-    }
-  })
+  
+
   observeEvent(input$menuitem,{
     # if item is chosen, alter calories and hunger based on item else dont do anything
     if (input$menuitem != "Choose Something") {
@@ -280,108 +343,9 @@ server <- function(input, output, session) {
   observeEvent(input$quit, stopApp())
 
 
-  ### Future reference stuff - GET IMAGES
-  renderCell <- function(gridrow,gridcol){
-    renderImage({
-      #select the icon appropriate for this cell
-      imageid <- getImageId(gridrow,gridcol,vals)
-      # style the image (add a border) to convey other information such as allowable moves
-      imgstyle <-  getImageStyle(gridrow,gridcol,vals)
-      imgsrc=switch(imageid,"www/emptycell.png","www/RedStoneSmall.png")
-      # Unfortunately, we are not able to re-size the image and still have the click event work.
-      # So the image files must have exactly the size we want.
-      # Also, z-order works only if 'position' is set.
-      list(src=imgsrc,style=paste0("position:relative;z-order:999;",imgstyle))
-    },deleteFile=FALSE)
-  }
+  
 
-  output$cell11 <- renderCell(1,1)
-  output$cell12 <- renderCell(1,2)
-  output$cell13 <- renderCell(1,3)
-  output$cell14 <- renderCell(1,4)
-  output$cell21 <- renderCell(2,1)
-  output$cell22 <- renderCell(2,2)
-  output$cell23 <- renderCell(2,3)
-  output$cell24 <- renderCell(2,4)
-  output$cell31 <- renderCell(3,1)
-  output$cell32 <- renderCell(3,2)
-  output$cell33 <- renderCell(3,3)
-  output$cell34 <- renderCell(3,4)
-  output$cell41 <- renderCell(4,1)
-  output$cell42 <- renderCell(4,2)
-  output$cell43 <- renderCell(4,3)
-  output$cell44 <- renderCell(4,4)
-
-  processClickEvent <- function(gridrow,gridcol){
-
-  }
-
-  observeEvent(input$click11,{processClickEvent(1,1)})
-  observeEvent(input$click12,{processClickEvent(1,2)})
-  observeEvent(input$click13,{processClickEvent(1,3)})
-  observeEvent(input$click14,{processClickEvent(1,4)})
-  observeEvent(input$click21,{processClickEvent(2,1)})
-  observeEvent(input$click22,{processClickEvent(2,2)})
-  observeEvent(input$click23,{processClickEvent(2,3)})
-  observeEvent(input$click24,{processClickEvent(2,4)})
-  observeEvent(input$click31,{processClickEvent(3,1)})
-  observeEvent(input$click32,{processClickEvent(3,2)})
-  observeEvent(input$click33,{processClickEvent(3,3)})
-  observeEvent(input$click34,{processClickEvent(3,4)})
-  observeEvent(input$click41,{processClickEvent(4,1)})
-  observeEvent(input$click42,{processClickEvent(4,2)})
-  observeEvent(input$click43,{processClickEvent(4,3)})
-  observeEvent(input$click44,{processClickEvent(4,4)})
-
-
-  output$die <- renderImage({
-    #select the icon appropriate for this die
-    imageid <- vals$dieNumber
-    imgsrc=switch(imageid,"www/Die1.png","www/Die2.png","www/Die3.png","www/Die4.png","www/Die5.png","www/Die6.png")
-    # Unfortunately, we are not able to re-size the image and still have the click event work.
-    # So the image files must have exactly the size we want.
-    # Also, z-order works only if 'position' is set.
-    list(src=imgsrc,style="position:relative;z-order:999;")
-  },deleteFile=FALSE)
-
-  observeEvent(input$clickdie,{
-    # change turn using mod operator
-    # vals$playerturn <- (vals$playerturn+1) %% 2
-    # generate a random number between 1 and 7 and then truncate to an integer to get a random die number
-    vals$dieNumber = as.integer(runif(1,1,7))
-    # For testing set the dieNumber to 1
-    #vals$dieNumber <- 1
-    vals$pieces <- updateBoardState(vals$pieces,vals$dieNumber)
-    #omitted hunger alteration for testing
-    #vals$hunger <- vals$hunger - vals$dieNumber
-    if (vals$hunger<0) {
-      showModal(starvingModal())
-      vals$calories <- vals$calories + 3000
-      vals$hunger <- vals$hunger + 30
-    }
-    locationindex <- which(pieces == CELLRED)
-    currentcol <- as.integer((locationindex-1)/GRIDSIZE)+1
-    currentrow <- locationindex - (gridcol-1)*GRIDSIZE
-    # checktile(row,col) checks what kind of tile you are in, returns 1 when restaurant, 2 when last tile, 0 when event
-    vals$boardstate <- checktile(currentrow, currentcol) # r creates copies, not pointers, so this should be fine
-    switch(vals$boardstate+1,
-           #Code for boardstate=0
-           ,
-           showModal(endModal()) # boardstate = 2
-    )
-  })
-    
-      # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
-    output$playertokenimg <- renderUI({
-     if(input$playertoken == "burger"){
-        img(src = "token1.png",height = 50, width = 50)}
-      else if(input$playertoken == "fries"){
-        img(src = "token2.png", height = 50, width = 50)}
-      else if(input$playertoken == "apple"){
-       img(src = "token3.png",height = 50, width = 50)}
-    
-  })  
-
+  
     
   output$img1 <- renderUI({
     if(input$Chosenfood == food1name){

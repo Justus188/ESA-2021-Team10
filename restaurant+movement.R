@@ -22,8 +22,10 @@ getMenu <- function(){
   
   # output will be dataframe containing menuitem,calories,hungereffect and append a none option and null option, and taken from a random food type of the total menu
   #test menu
-  restaurantmenu <- data.frame(menuitem = c("Choose Something","fish","chicken","beef","None"),calories = c(NA,100,200,300,0), hungereffect = c(NA,1,1,1,1))
+  restaurantmenu <- data.frame(menuitem = c("Choose Something","fish","chicken","beef","None"),
+                               calories = c(NA,100,200,300,0), hungereffect = c(NA,1,1,1,1))
   restaurantmenu
+  
 }
 
 
@@ -49,10 +51,8 @@ menuModal <- function(failed = FALSE){
   )
 }
 
-checktile <- function(row,col){
-  tile <- -1
-  playerpos <- paste(row,col)
-  if (playerpos %in% eventlist) {tile <- 0} else if (playerpos == paste(1,1)) {tile <- 2} else {tile <- 1}
+checktile <- function(row,col, isEvent){
+  if (isEvent[row+1, col+1]) {tile <- 0} else if (row==8 && col == 9) {tile <- 2} else {tile <- 1}
   #tile 0 means event, tile 1 means restaurant, tile 2 means end game
   tile
 }
@@ -85,42 +85,32 @@ getSingleStepLocation <- function(gridrow,gridcol,gridsize){
 
 
 
-updateBoardState <- function(pieces,dieNumber,gridsize){
-  # For each game variant, there is exactly one piece of each color (red and blue) on the board.
-  # Find the cell with the piece whose turn is next
-  #targetcontent <- CELLRED
-  #misscontent <- CELLBLUE
-  #if (playerturn==BLUETURN) {
-  #  targetcontent <- CELLBLUE
-  #  misscontent <- CELLRED
-  #}
-  locationindex <- which(pieces == 2)
-  gridcol <- as.integer((locationindex-1)/gridsize)+1
-  gridrow <- locationindex - (gridcol-1)*gridsize
+updateBoardState <- function(playerpos,dieNumber,gridsize){
+  row <- playerpos[1]
+  col <- playerpos[2]
   # Now we know the gridrow and gridcol where the piece is located
-  # Remove the piece from that location
-  pieces[gridrow,gridcol] <- 1
-  newlocation <- list(row=gridrow,col=gridcol)
-    # MONOPOLY
-  while (dieNumber>0) {
-    newlocation <- getSingleStepLocation(newlocation$row,newlocation$col,gridsize)
-    dieNumber <- dieNumber -1
-    }
-  # Update the newlocation with the pieces that are there
-  gridrow <- newlocation$row
-  gridcol <- newlocation$col
-  pieces[gridrow,gridcol] <- 2
+  
+  # while (dieNumber>0) {
+  #   newlocation <- getSingleStepLocation(newlocation$row,newlocation$col,gridsize)
+  #   dieNumber <- dieNumber -1
+  #   }
+  
+  if (row == 9 && col != 0){
+    col <- col - dieNumber
+    if (col < 0) {row <- row + col; col <- 0}
+  } else if (col == 0 && row != 0) {
+    row <- row - dieNumber
+    if (row<0) {col <- col - row; row <- 0}
+  } else if (row == 0 && col != 9){
+    col <- col + dieNumber
+    if (col > 9) {row <- row + col - 9; col <- 9}
+  } else if(col == 9) {
+    row <- row + dieNumber
+    if (row > 8) {row <- 8}
+  } else print("Magic dice wut")
+  
   # Return the pieces matrix
-  pieces
+  c(row, col)
 }
 
-getImageId <- function(gridrow,gridcol,vals){
-  imageid <- vals$pieces[gridrow,gridcol]
-  imageid
-}
-getImageStyle <- function(gridrow,gridcol,vals){
-  imgstyle <- "border: 2px solid blue;"
-  # If the cell should be highlighted draw a blue border around it
-  #if (boardstate$highlights[gridrow,gridcol])imgstyle <- "border: 2px solid blue;"
-  imgstyle
-}
+getTokenSrc <- function(input) return(paste0("token", switch(input$playertoken, "burger"=1, "fries"=2, "apple"=3), ".png"))
