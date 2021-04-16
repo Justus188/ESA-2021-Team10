@@ -13,12 +13,9 @@ library(tidyverse)
 
 source("lastTile.R")
 getallMenu <- function(){
-
   #extract a df of all menu items
   query <- "SELECT * FROM CarelorieMenu"
-  allmenu <- getQuery(query)
-  
-  allmenu
+  getQuery(query)
 }
 
 
@@ -32,7 +29,6 @@ getMenu <- function(){
   selectedmenu <- getQuery(query)
   
   selectedmenu <- rbind(selectedmenu,c(0,"Nothing","Nothing",0,0,"Blank.png"))
-  
 }
 
 
@@ -59,11 +55,7 @@ menuModal <- function(failed = FALSE){
   )
 }
 
-checktile <- function(row,col, isEvent){
-  if (isEvent[row+1, col+1]) {tile <- 0} else if (row==8 && col == 9) {tile <- 2} else {tile <- 1}
-  #tile 0 means event, tile 1 means restaurant, tile 2 means end game
-  tile
-}
+checktile <- function(row, col, isEvent) if (isEvent[row+1, col+1]) 0 else if (row==8 && col == 9) 2 else 1
 
 
 getSingleStepLocation <- function(gridrow,gridcol,gridsize){
@@ -93,16 +85,10 @@ getSingleStepLocation <- function(gridrow,gridcol,gridsize){
 
 
 
-updateBoardState <- function(playerpos,dieNumber,gridsize){
+updateBoardState <- function(playerpos,dieNumber){
   row <- playerpos[1]
   col <- playerpos[2]
-  # Now we know the gridrow and gridcol where the piece is located
-  
-  # while (dieNumber>0) {
-  #   newlocation <- getSingleStepLocation(newlocation$row,newlocation$col,gridsize)
-  #   dieNumber <- dieNumber -1
-  #   }
-  
+
   if (row == 9 && col != 0){
     col <- col - dieNumber
     if (col < 0) {row <- row + col; col <- 0}
@@ -115,10 +101,9 @@ updateBoardState <- function(playerpos,dieNumber,gridsize){
   } else if(col == 9) {
     row <- row + dieNumber
     if (row > 8) {row <- 8}
-  } else print("Magic dice wut")
+  } else stop("DiceError: Something went wrong in restaurant+movement.R/updateBoardState")
   
-  # Return the pieces matrix
   c(row, col)
 }
 
-getTokenSrc <- function(input) return(paste0("token", switch(input$playertoken, "burger"=1, "fries"=2, "apple"=3), ".png"))
+getTokenSrc <- function(input) return(paste0("token", switch(input$playertoken, "Burger"=1, "Fries"=2, "Apple"=3), ".png"))
