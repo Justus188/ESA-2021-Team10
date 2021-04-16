@@ -103,10 +103,10 @@ ui <- dashboardPage(
                                       # Only show this panel if land on event
                                       conditionalPanel(
                                           condition = "output.event == true",
-                                          fluidRow(column(4, offset = 3,
-                                                          tags$h1("Event")
-                                                   ),
-                                          )
+                                          fluidPage(     
+                                                 uiOutput("EventPage1"),
+  uiOutput("EventPage2"),
+  uiOutput("EventPage3")                      )
                                         )
                             )
                         )
@@ -141,6 +141,7 @@ server <- function(input, output, session) {
                          hunger = 10,
                          dieNumber = 2,
                          QuestionNo = NULL,
+                         event_no=NULL,
                          boardstate = -1,
                          playerpos = c(9, 9), # (row,col) track token location; each edge has length 10 starting from (10,10), ends(9,10)
                          action.log = data.frame(Food="Burger", Calories=as.integer(10), Hunger = "+10"))
@@ -264,60 +265,105 @@ server <- function(input, output, session) {
   })
 
   ### Event logic
+  # Should observe for the user's position in the game == event tile's position
+   observe({
+  if (vals$boardstate==0){
+    vals$QuestionNo <- getRandQuestionNo()
+    
+    output$EventPage1 <- renderUI({
+      tagList(
+      tags$h1("Event"),
+      #Show randomly generated question 
+      radioButtons(inputId="selectedAns",
+                  label=getQuestionStatement(vals$QuestionNo),
+                  choices = c("TRUE", "FALSE")),
+      actionButton(inputId="checkbutton", label="Check!"))})
+  }
+})
+
+   
+#Pressed the check button
   observeEvent(input$checkbutton,{
-    # DEBUG - Print statements
+    #Print statements
     print(vals$QuestionNo)
     print(input$selectedAns)
     #Check the user's ans
     outcome <- checkAnswer(vals$QuestionNo, input$selectedAns)
-
+    
     if (outcome==TRUE){
       #Tell them that they selected the correct answer
       #Change the button from Check to Proceed to Event
-      #Close the current modal
-      removeModal()
-      showModal(QuestionModal(correct = TRUE, wrong=FALSE, question_no=vals$QuestionNo))
+      
+      #Clear EventPage1
+      output$EventPage1 <- renderUI(NULL)
+      
+      #Set up EventPage2
+      output$EventPage2 <- renderUI({
+      tagList(
+      tags$h1("Event"),
+      #Show randomly generated question 
+      radioButtons(inputId="selectedAns",
+                  label=getQuestionStatement(vals$QuestionNo),
+                  choices = c("TRUE", "FALSE")),
+      tags$b(getQuestionExplanation(vals$QuestionNo)),
+      br(),
+      tags$b("Answer is Correct! Press proceed to continue"),
+      actionButton(inputId="proceedbutton", label="Proceed!"))})
       #Able to Proceed to Random Events page
-
-    }else{
-      #Tell them that they selected the wrong answer
+      
+  }else{
+     #Tell them that they selected the wrong answer
       #Change the button from Check to Proceed to Event
       #Close the current modal
-      removeModal()
-      showModal(QuestionModal(correct = FALSE, wrong=TRUE, question_no=vals$QuestionNo))
-      #Able to Proceed to Random Events page
-    }
-  })
-
-  observeEvent(input$proceedbutton, {
-    #Close the current modal
-    removeModal()
-
-    #Open up a new modal that shows the randomization part
-    show_modal_gif(src = "EventRandom.gif",width="200px",height="200px",modal_size = "s")
-    Sys.sleep(5)
-    remove_modal_gif()
-
-    #Show the end result
-    ##Assume there are 10 events, randomly choose 1 event,
-    EventNo <- sample(1:as.numeric(getMaxNumberOfEvents()), 1)
-
-    showModal(EventsModal(EventNo))
-
-    #Should add in parts to modify Hunger, Calories and Board Position values.
-    if (getEventType(EventNo) == 1){
-      #Got a good event, decrease Calories, increase Hunger, PLEASE ADVISE how much
-      vals$calories =vals$calories - 5
-      vals$hunger =vals$hunger + 5
-    }else{
-      vals$calories =vals$calories + 5
-      vals$hunger =vals$hunger - 5
-    }
+      
+      #Clear EventPage1
+      output$EventPage1 <- renderUI(NULL)
+      
+      #Set up EventPage2
+      output$EventPage2 <- renderUI({
+      tagList(
+      tags$h1("Event"),
+      #Show randomly generated question 
+      radioButtons(inputId="selectedAns",
+                  label=getQuestionStatement(vals$QuestionNo),
+                  choices = c("TRUE", "FALSE")),
+      tags$b(getQuestionExplanation(vals$QuestionNo)),
+      br(),
+      tags$b("Answer is Incorrect! Press proceed to continue"),
+      actionButton(inputId="proceedbutton", label="Proceed!"))})
+      #Able to Proceed to Random Events page    
+    
   }
-  )
-  observeEvent(input$continuebutton, {
-    #Close the current modal
-    removeModal()
+  })  
+  
+  
+  
+  observeEvent(input$proceedbutton, {
+    ##Randomly choose 1 event,
+    vals$event_no <- sample(1:getMaxNumberOfEvents(), 1)
+    
+    #Should add in parts to modify Hunger, Calories.
+    vals$calories = vals$calories + getEventCalorie(vals$event_no)
+    vals$hunger = vals$hunger + getEventHunger(vals$event_no)
+    
+    
+    #Clear Page2
+    output$EventPage2 <- renderUI(NULL)
+    
+    #Set up Page3
+    output$EventPage3 <- renderUI({
+      tagList(
+      tags$h2(getEventName(vals$event_no)),
+      tags$h2(getEventDescription(vals$event_no)),
+      actionButton(inputId="continuebutton", label="Continue")
+    )}) 
+    
+    
+}
+)
+  observeEvent(input$continuebutton,{
+    #Should go back to play the game, is it just this ???
+    vals$boardstate <- -1
   })
 
   ### TEMPORARY - End of game trigger
