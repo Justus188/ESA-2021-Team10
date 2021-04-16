@@ -58,21 +58,21 @@ checktile <- function(row,col){
 }
 
 
-getSingleStepLocation <- function(gridrow,gridcol){
+getSingleStepLocation <- function(gridrow,gridcol,gridsize){
   
   # We assume that the direction is clockwise
   newgridrow <- gridrow
   newgridcol <- gridcol
-  if (gridrow==GRIDSIZE){
+  if (gridrow==gridsize){
     if (gridcol>1){
       newgridcol <- gridcol-1
     } else newgridrow <- gridrow-1
   }else{if (gridrow==1){
-    if (gridcol<GRIDSIZE){
+    if (gridcol<gridsize){
       newgridcol <- gridcol+1
     } else newgridrow <- gridrow+1
   }else {# gridrow is neither 1 nor GRIDSIZE
-    if (gridcol==GRIDSIZE){
+    if (gridcol==gridsize){
       newgridrow <- gridrow+1
     } else { # Assume gridcol==1
       newgridrow <- gridrow-1
@@ -85,7 +85,7 @@ getSingleStepLocation <- function(gridrow,gridcol){
 
 
 
-updateBoardState <- function(pieces,dieNumber){
+updateBoardState <- function(pieces,dieNumber,gridsize){
   # For each game variant, there is exactly one piece of each color (red and blue) on the board.
   # Find the cell with the piece whose turn is next
   #targetcontent <- CELLRED
@@ -94,22 +94,22 @@ updateBoardState <- function(pieces,dieNumber){
   #  targetcontent <- CELLBLUE
   #  misscontent <- CELLRED
   #}
-  locationindex <- which(pieces == CELLRED)
-  gridcol <- as.integer((locationindex-1)/GRIDSIZE)+1
-  gridrow <- locationindex - (gridcol-1)*GRIDSIZE
+  locationindex <- which(pieces == 2)
+  gridcol <- as.integer((locationindex-1)/gridsize)+1
+  gridrow <- locationindex - (gridcol-1)*gridsize
   # Now we know the gridrow and gridcol where the piece is located
   # Remove the piece from that location
-  pieces[gridrow,gridcol] <- CELLEMPTY
+  pieces[gridrow,gridcol] <- 1
   newlocation <- list(row=gridrow,col=gridcol)
     # MONOPOLY
   while (dieNumber>0) {
-    newlocation <- getSingleStepLocation(newlocation$row,newlocation$col)
+    newlocation <- getSingleStepLocation(newlocation$row,newlocation$col,gridsize)
     dieNumber <- dieNumber -1
     }
   # Update the newlocation with the pieces that are there
   gridrow <- newlocation$row
   gridcol <- newlocation$col
-  pieces[gridrow,gridcol] <- CELLRED
+  pieces[gridrow,gridcol] <- 2
   # Return the pieces matrix
   pieces
 }
