@@ -25,7 +25,7 @@ food5_ingredients = "Grilled chicken, lettuce, tortilla"     # for testing
 
 GRIDSIZE <- 10
 
-createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="70px", width = "70px", inline = T))
+createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="50px", width = "50px", inline = T))
 createRow <- function(i) return(lapply(0:9, createTile, i = i))
 
 ui <- dashboardPage(
@@ -50,7 +50,7 @@ ui <- dashboardPage(
                     uiOutput("playertokenimg"), # image output code line 355-ish
                     tags$h4("Instructions"),
                     tags$p(" INSERT INSTRUCTIONS "),
-                    actionButton("start", "Start the Game!"),
+                    actionButton("start_welcome", "Start the Game!"),
                     actionButton("temp.lastTileTrigger", "Last Tile"),
                     actionButton("temp.eventTrigger", label="Land on Event"),
                     actionButton("testmenu","TestMenu"),
@@ -67,7 +67,7 @@ ui <- dashboardPage(
                         # Then, to superimpose images, style them to be 'position:relative;z-order:999'
                         # TODO: Change sizes of cells; gridsize = 10
                         mainPanel(width=10,
-                                  img(src='board.png',style="position:absolute;z-order:0",width="820px",height="800px"),
+                                  img(src='board.png',style="position:absolute;z-order:0",width="525px",height="505px"),
                                   createRow(0), tags$br(),
                                   createRow(1), tags$br(),
                                   createRow(2), tags$br(),
@@ -118,7 +118,7 @@ ui <- dashboardPage(
                             title = "See where you stand!",width=12,
                             tableOutput("leaderboard"),
                             "Not here? Play again!",
-                            actionButton("start", "Start the Game!")
+                            actionButton("start_leaderboard", "Start the Game!")
                         ))
                     
                     
@@ -145,9 +145,7 @@ server <- function(input, output, session) {
                          playerpos = c(9, 9), # (row,col) track token location; each edge has length 10 starting from (10,10), ends(9,10)
                          action.log = data.frame(Food="Burger", Calories=as.integer(10), Hunger = "+10"))
   
-  output$testvar <- reactive({
-    print(vals$playerpos)
-    print(vals$dieNumber)})
+  output$testvar <- reactive(print(vals$playerpos))
   
   ### RENDERING FUNCTIONS
   renderCell <- function(playerpos, cellid, input){
@@ -156,7 +154,7 @@ server <- function(input, output, session) {
     col <- as.integer(substr(cellid, 2,2))
     
     renderImage({
-      imgsrc <- "www/token2.png" #Blank
+      imgsrc <- "www/Blank.png" #Blank
       if ((row %in% c(0,9)) || (col %in% c(0,9))) {
         if(playerpos[1] == row && playerpos[2] == col) {
           imgsrc <- paste0("www/",getTokenSrc(input))
@@ -166,7 +164,7 @@ server <- function(input, output, session) {
         }
       }
       
-      imgstyle <-  getImageStyle() # style the image (add a border) to convey other information such as allowable moves
+      imgstyle <- getImageStyle() # style the image (add a border) to convey other information such as allowable moves
       
       # Unfortunately, we are not able to re-size the image and still have the click event work.
       # So the image files must have exactly the size we want.
@@ -183,7 +181,7 @@ server <- function(input, output, session) {
   }
   listofcells = lapply(genCellIds(), function(x) return(paste0("cell", x)))
   observe({
-    dummy <- vals$playerpos + 1
+    dummy <- vals$playerpos
     mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input)}, x=listofcells, y=genCellIds())
     })
   
@@ -201,11 +199,10 @@ server <- function(input, output, session) {
   output$playertokenimg <- renderUI({img(src = getTokenSrc(input), height=50, width=50)})
   
   ### GAME LOGIC ###############################################################
-  observeEvent(input$start, {
+  observeEvent(any(input$start_welcome, input$start_leaderboard, input$start_endModal, input$start_published_Modal),{
     updateTabItems(session, "tabSelect", "gameboard")
     print("Starting game")
-  }) #Insert start game code here
-    ## update the playertoken image that the player chose 
+  }, ignoreInit = T)
   
   observeEvent(input$clickdie,{
     # change turn using mod operator
@@ -340,7 +337,7 @@ server <- function(input, output, session) {
   })
 
   ### Quit correctly
-  observeEvent(input$quit, stopApp())
+  observeEvent(any(input$quit_endModal, input$quit_endModal, input$quit_pubishedModal), stopApp(), ignoreInit = T)
 
 
   

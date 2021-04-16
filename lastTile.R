@@ -45,8 +45,8 @@ endModal <- function() {modalDialog(
   "Here's how other players did!",
   tableOutput("leaderboard"),
   footer = tagList(
-    actionButton("quit", "Quit"),
-    actionButton("start", "Restart"),
+    actionButton("quit_endModal", "Quit"),
+    actionButton("start_endModal", "Restart"),
     actionButton("publish", "Publish Your Score!")
   )
 )}
@@ -56,7 +56,7 @@ nameModal <- function(){modalDialog(
   textInput("name.name", "Your name is: ", getRandomPlayerName()),
   "(You can change it!)",
   footer= tagList(
-    actionButton("quit", "Quit"),
+    actionButton("quit_nameModal", "Quit"),
     actionButton("name.done", "That's my name!")
   )
 )}
@@ -66,7 +66,7 @@ publishedModal <- function(){modalDialog(
   "Your score has been published! Do you see it in the leaderboard?",
   tableOutput("leaderboard"),
   footer = tagList(
-    actionButton("quit", "Quit"),
-    actionButton("start", "Restart")
+    actionButton("quit_publishedModal", "Quit"),
+    actionButton("start_publishedModal", "Restart")
   )
 )}
