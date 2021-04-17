@@ -28,7 +28,7 @@ getMenu <- function(){
   query <- paste0("SELECT * FROM CarelorieMenu WHERE Foodtype = '" ,selectedfoodtype,"' ORDER BY RAND() LIMIT 5")
   selectedmenu <- getQuery(query)
   
-  selectedmenu <- rbind(selectedmenu,c(0,"Nothing","Nothing",0,0,"Blank.png"))
+  selectedmenu <- rbind(selectedmenu,c("Eat Nothing",NULL,0,0,"Blank.png",-1))
 }
 
 
