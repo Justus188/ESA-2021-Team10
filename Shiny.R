@@ -205,7 +205,7 @@ server <- function(input, output, session) {####################################
   
   ### Init #####################################################################
   
-  allmenu <- getallMenu() #df with all menu items
+  allmenu <- rbind(getallMenu(),c("Eat Nothing",0,0,0,"Blank.png",-1)) #df with all menu items
   leaderBoard <- renderTable({input$name.done; getLeaderBoard()}) #pregenerate leaderboard for use in multiple screens
   
   ### Regenerate on new game # Shift to start() later ##########################
@@ -360,8 +360,8 @@ server <- function(input, output, session) {####################################
   observeEvent(input$choosefood_yes,{
     allMenu <- rbind(getallMenu(),c("Eat Nothing",0,0,0,"Blank.png",-1))
     
-    newCalories <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Calories"])
-    newHunger <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Hunger"])
+    newCalories <- as.integer(allMenu[allMenu$Food == input$Chosenfood,"Calories"])
+    newHunger <- as.integer(allMenu[allMenu$Food == input$Chosenfood,"Hunger"])
     
     vals$calories <- vals$calories + newCalories
     vals$hunger <- vals$hunger + newHunger
