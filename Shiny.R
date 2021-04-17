@@ -143,15 +143,15 @@ ui <- dashboardPage( ###########################################################
                          ),
                          tabItem(tabName = "leaderboard", 
                                  h2("Hall of Fame"),
-                                 # conditionalPanel(
-                                 #   condition="output.recent_game_toggle ==true",
-                                 #   textOuput("recent_game"),
-                                 #   actionButton("publish", "Publish Your Score!")
-                                 # ),
-                                 # conditionalPanel(
-                                 #   condition="output.recent_publish_toggle ==true",
-                                 #   textOutput("pubilish_success")
-                                 # ),
+                                 conditionalPanel(
+                                   condition="output.recent_game_toggle ==true",
+                                   textOuput("recent_game"),
+                                   actionButton("publish", "Publish Your Score!")
+                                 ),
+                                 conditionalPanel(
+                                   condition="output.recent_publish_toggle ==true",
+                                   textOutput("pubilish_success")
+                                 ),
                                  box(
                                    title = "See where you stand!",width=12,
                                    tableOutput("leaderboard"),
