@@ -1,0 +1,103 @@
+"FoodId","Food","Foodtype","Hunger","Calories","FoodImage","Ingredients","Filling"
+1,Apple Pie,Fast Food,112,260,Apple-Pie.png,"Apples, Enriched Flour, Sugar, Palm Oil, Water, Apple Juice Concentrate, Modified Food Starch, Invert Syrup, Yeast, Salt, Cinnamon",somewhat filling 
+2,Bak Kut Teh,Chinese Restaurant,322,342,bakuteh.png,"water, white pepper, black pepper, salt, star anise, ground cinnamon, garlic , dark soy sauce, pork ribs",somewhat filling 
+3,"Ban Mian (with egg, meat & veggies)",Chinese Hawker,550,475,banmian1.jpg,"flat egg noodles,anchovies-based stock,minced pork, fried anchovies, egg.",filling
+4,Beef Rendang,Indian Coffee Shop,350,228,beef-rendang-1-500x453.jpg,"coconut milk, beef short ribs, spices, rice",not so filling
+5,Big Mac,Fast Food,675,522,food_main_big_mac.png,"Soft bun, lettuce, beef patty x2, Onions, cheese, bigMac sauce",not so filling
+6,Bubble Tea with milk,Convenience Store,442,232,milkt.png,"bags of black tea ,water, whole milk , sugar",somewhat filling 
+7,Bubble Tea with milk & pearls,Convenience Store,682,340,bbt.jpg,"bags of black tea ,water, whole milk , sugar, tapioca pearls, brown sugar",not so filling
+8,Bubor Cha Cha,Chinese Hawker,119,390,bubur-cha-cha.jpg,"sweet potato (orange, yellow purple), yam, sago, tapioca flour, water, coconut milk, sugar",filling
+9,Carrot Cake (mashed & fried),Dim Sum Restaurant,180,467,carrot-cake-chomp.jpg,"cake, rice flour, soy sauce, chilli, garlic, eggs, pickled raddish",not so filling
+10,Century Egg Porridge,Chinese Restaurant,877,422,R00580_Minced-Pork-Salted-Century-Egg-Congee.jpg,"rice, chicken stock, chicken breast/thigh, ginger, century eggs",filling
+11,Char Siew Pau,Dim Sum Restaurant,80,212,pau_charsiew2md.jpg,"chinese bbq pork, oil, flour, sauces(oyster, soy, dark soy), sesame oil",somewhat filling
+12,Char Siew Rice,Chinese Restaurant,1152,600,char-siew-rice-2-300.jpg,"pork belly, garlic, shaoxing wie, sauce(oyster, soy), spice, rice",filling
+13,Chee Cheong Fun,Dim Sum Restaurant,50,133,CheeCheongFun_21.jpg,"char siew, rice flour, wheat starch, soy sauce, dried shrimp",filling
+14,Cheeseburger,Fast Food,378,300,cheeseburger.png,"Soft bun, lettuce, beef patty, cheese",not so filling
+15,Chendol (with coconut & evaporated milk),Chinese Hawker,234,593,chendoll.jpg,"red bean, shaved ice, mung bean, grass jelly, coconut milk, syrup",filling
+16,Cheng Tng,Chinese Hawker,78,257,chengtng6.jpg,"dried longan, dried snow fungus, rock sugar, dried lotus seed,ginkgo nuts, red dates",not so filling
+17,Chicken Curry,Indian Coffee Shop,488,450,chicken-curry-kapitan.jpg,"coconut milk, chicken, curry paste, poppy seeds, potato",somewhat filling 
+18,Chicken Curry Puff,Dim Sum Restaurant,103,246,R00746_Baked-Mild-Ckn-Curry-Puff.jpg,"curry powder, chicken breast, potato, rice flour",not so filling
+19,Chicken McNuggets,Fast Food,310,303,Nuggets.png,chicken nuggets,filling
+20,Chicken Pau,Dim Sum Restaurant,70,204,Big-Pau_2.jpg,"steamed buns, pork, oyster sauce, sesame oil, sugar",filling
+21,Chicken Porridge,Chinese Restaurant,442,214,chickenpor.jpg,"chicken breast, ginger, rice, sesame oil",not so filling
+22,Chicken Rice,Chinese Restaurant,1296,702,chickenrice.jpg,"chicken, soy sauce, chicken broth, salt",somewhat filling 
+23,Chicken Satay,Indian Coffee Shop,13,35,chicken-satay.jpg,"peanut butter, skinless chicken, honey, lemongrass, salt",not so filling
+24,Chinese Rojak,Indian Coffee Shop,179,443,chirojak.jpg,"you tiao, pineapple, sugar, tamarind paste, sprouts",not so filling
+25,Chwee Kuay,Dim Sum Restaurant,25,57,chweekway.jpg,"rice flour, preserved turnip, wheat starch, dark soy sauce",filling
+26,Cream of Mushroom,Western Diner,145,132,"1506455983-delish-cream-mushroom-soup.jpg","heavy whipping cream, chicken broth, garlic, fresh mushroom",filling
+27,Curry Laksa,Indian Coffee Shop,531,589,CurryLaksa-1.jpg,"chicken thigh, coconut milk, brean sprouts, deep fried tofu",filling
+28,Double Cheeseburger,Fast Food,581,440,food_main_double_cheeseburger.png,"Soft bun, lettuce, beef patty x2, cheese",filling
+29,Double McSpicy,Fast Food,802,800,food_main_double_mcspicy.png,"Soft bun, spicy fried chicken cutlet x2, lettuce",filling
+30,Double Quarter Pounder with Cheese,Fast Food,996,768,quaterpoundercheese.jpg,"bun, processed cheese, ketchup, pickles, onion, mustard, beef patty x2",filling
+31,Double Filet-O-Fish,Fast Food,700,474,Double-FOF.png,"Soft bun, fish filet x2 , cheese",not so filling
+32,Doughnut,Convenience Store,105,304,food32.png,"flour, sugar, buttermilk, baking soda, salt, vanilla extract, oil",filling 
+33,"Doughnut, sugared",Convenience Store,62,165,donut.jpg,"sugar, flour, sugar, buttermilk, baking soda, salt, vanilla extract, oil",not so filling
+34,Duck Rice ,Chinese Restaurant,1313,706,specialty-duck-rice.jpg,"tau kwa, duck, dark soy sauce, rice",very filling
+35,Egg Tart,Convenience Store,53,177,Chinese-tarts-6.jpg,"cake flour, evaporated milk, sugar, egg, vanilla extract",not so filling
+36,Filet-O-Fish ,Fast Food,497,332,FOF.png,"Soft bun, fish filet, cheese",filling
+37,Fish & Chips,Western Diner,1219,848,fnc.jpg,"potato, cod fillets, egg, baking powder, dark beer",very filling
+38,Fish Head Beehoon Soup,Chinese Hawker,743,666,fishheadbh.jpg,"fish head, rice noodles, evaporated milk, pickled mustard greens, choy sum",very filling
+39,Fish Head Curry,Indian Coffee Shop,338,288,fish-head-curry.jpg,"fish curry powder, fish head, coconut milk, peppers",filling
+40,Fish Otah,Indian Coffee Shop,7,18,fishotah.jpg,"coconut milk, fish fillet, tapioca flour, pepper, lemongrass",not so filling
+41,Fish Porridge,Chinese Restaurant,559,261,fishpor.jpg,"fish, soy sauce, sesame oil, preserved vegetables",filling
+42,Fish Slice Beehoon Soup,Chinese Hawker,413,349,fishbeehoon.jpg,"cod fish, rice noodles, choy sum, soy sauce",filling
+43,"Fishball Noodles, Dry",Chinese Hawker,448,364,"4a570e974eb8d32a5081495916_original_.jpg","egg noodles, fish cake, fish balls, minced pork, soy sauce",filling
+44,"Fishball Noodles, Soup",Chinese Hawker,347,330,French-Fries-Live-Food-Station.png,"beehoon, fish cae, fish balls, ground pork, chy sim, ikan bilis",filling
+45,French Fries,Fast Food,141,450,French-Fries-Live-Food-Station.jpg,"potato, salt",not so filling
+46,Fried Beehoon (plain),Chinese Hawker,315,252,beehoon.jpg,"beehoon, oyster sauce, soy sauce, bean sprouts",filling
+47,Fried Chicken Drumstick,Fast Food,78,207,frieddrum.jpg,"chicken drumsticks, pepper, flour",not so filling
+48,Fried Chicken Wing,Fast Food,42,109,friedwings.jpg,"chicken wings, pepper, flour",not so filling
+49,Fried Hokkien Prawn Mee,Chinese Hawker,746,615,hokkienmee.jpg,"prawn, beehoon, ikan bilis, squid, fish sauce",filling
+50,Fried Kway Teow (with cockles),Chinese Hawker,949,743,charkwayteow2.jpg,"rice noodles, chinese sausage, oyster sauce, fish cake, cockles",very filling
+51,Fried Rice ,Chinese Restaurant,1069,508,chicken-fried-rice-0109w.jpg,"rice, oyster sauce, soy auce, sesame oil",very filling
+52,Green Bean Soup,Chinese Hawker,94,237,greenbean.jpg,"green beans, gingko nuts, small tapioca pearls, pandan, rock sugar",filling
+53,Ham Chim Peng (red bean filling),Dim Sum Restaurant,89,273,hamcp.jpg,"red bean paste, glutinous rice, fice spice powder, flour",not so filling
+54,Hamburger,Fast Food,283,252,hamburger.png,"Soft bun, lettuce, beef patty, pickles",filling
+55,Herbal Black Chicken Soup,Chinese Restaurant,183,186,"20160803_GinsengHerbalChicken_tnp.jpg","ginseng, black chicken, red dates, dried longan, goji berries, dang shen",filling
+56,Herbal Jelly,Chinese Restaurant,23,71,herbaljelly.jpg,"grass jelly powder, black tea, milk, sugar",not so filling
+57,Hor Fun,Chinese Hawker,782,708,horfun.jpg,"hor fun, pork, oyster sauce, shrimp, fish cake, egg",filling
+58,Hotcakes,Fast Food,824,557,HotCakes.png,"Butter, hotcake, maple syrup",filling
+59,Hotcakes with Sausage,Fast Food,761,640,hotcakes-with-sausage.png,"Butter, hotcake, sausage patty",filling
+60,Ice Kachang,Chinese Hawker,77,257,ice.jpg,"red bean, grass jelly, gula melaka, coconut cream, brown sugar, condensed milk, ice",not so filling
+61,Indian Rojak,Indian Coffee Shop,287,756,indianrojak.jpg,"potato, rice flour, oil, peanut (sauce)",filling
+62,"Kway Chap (with meat, intestine & taupok)",Chinese Restaurant,858,648,chriskwaychap.jpg,"rice noodles, garlic, chicken, hard boiled eggs, tofu, soy sauce, vinegar",filling
+63,Laksa,Chinese Hawker,857,589,curry-laksa-thumb.jpg,"coconut milk, taupok, fish cake, vermicelli rice noodles, curry paste",very filling
+64,Lor Mee,Chinese Hawker,390,383,penang-lor-mee.jpg,"pork belly, fish cake, choy sum, dark soy sauce, yellow noodles",filling
+65,McChicken,Fast Food,543,385,McChicken.png,"Soft bun, chicken patty, lettuce, mayonnaise",filling
+66,McDouble,Fast Food,431,392,food_main_double_cheeseburger.png,"Soft bun, lettuce, beef patty x2, cheese",filling
+67,McSpicy,Fast Food,739,522,food_main_mcspicy.png,"Soft bun, spicy fried chicken cutlet, lettuce, mayonnaise",filling
+68,Mee Chiang Kueh,Dim Sum Restaurant,82,186,minchiangkueh.jpg,"water, sugar, egg, peanut filling",not so filling
+69,Mee Goreng,Malay Hawker,954,660,malaysian-chicken-mee-goreng-49049-2.jpg,"noodle, tofu, garlic, spice, chicken, spring onion",filling
+70,Mee Rebus,Malay Hawker,526,558,meerebus.jpg,"egg noodle, tofu, garlic, spice, green chilli, beansprout",filling
+71,Mee Siam,Malay Hawker,574,519,meesiam.jpg,"rice vermicelli, tofu, garlic, spice, chilli pepper, boiled egg, beansprout",filling
+72,Mee Soto,Malay Hawker,630,432,sotoayamtopbowl.jpg,"chicken, rice vermicelli, shallot, garlic, spring onion, black pepper, boiled egg, lime, beansprout",somewhat filling
+73,Mutton Soup,Indian Coffee Shop,327,285,muttonsoup.jpg,"water, mutton with bones, shallots, tomato, spices, ground black pepper",somewhat filling
+74,Nasi Briyani with Chicken,Indian Coffee Shop,1433,880,zaffron-kitchen-best-biryani-singapore-2.jpg,"basmati rice, pandan leaves, evaporated milk, spices chicken",filling 
+75,Nasi Lemak,Indian Coffee Shop,1024,600,nasi-lemak-1.jpg,"rice, coconut milk, pandan leaf, chicken wing, egg, ikan bilis, chilli",filling
+76,Noodles with Minced Pork & Mushroom (Dry),Chinese Hawker,598,511,noodmincedpork.jpg,"flour, water, minced pork, mushroom, chili sauce",filling
+77,Oyster Omelette,Dim Sum Restaurant,276,650,oysterom.jpg,"rice flour, water, egg, oyster",filling
+78,Pig Organ Soup,Chinese Restaurant,185,158,pigorgansoup.jpg,"water, salt, pig stomach, pig liver, mushroom, white peppercorn",not so filling
+79,Pizza,Western Diner,445,299,pizza.jpg,"(Once slice) flour, water, salt, cheese, tomato sauce, pepperoni slices",somewhat filling
+80,Popiah,Dim Sum Restaurant,38,92,popiah.png,"spring roll skin, bamboo shoots, onion, garlic, hard-boiled egg",not so filling
+81,Pork Pau,Dim Sum Restaurant,105,246,Big-Pau_2.jpg,"flour, pork, egg, yam bean",not so filling
+82,Pork Porridge,Chinese Restaurant,767,362,pork_porridge.jpg,"water, rice, minced pork, groun pepper, soy sauce",somewhat filling
+83,Potato Chips,Convenience Store,310,184,Homemade-Potato-Chips-1-of-1.jpg,"Potato, salt, oil",not so filling
+84,"Prawn Noodles, Dry",Chinese Hawker,546,459,prawnoodledry.jpg,"egg noodles, , fishcake, prawn, beansprout, chilli sauce",somewhat filling
+85,"Prawn Noodles, Soup",Chinese Hawker,358,293,prawnoodlesoup.jpg,"egg noodles, , fishcake, prawn, beansprout",somewhat filling
+86,Pulut Hitam with coconut milk,Chinese Hawker,90,290,bubur-hitam-3.jpg,"palm sugar, black glutinous rice, coconut cream, pandan leaves",somewhat filling
+87,Quarter Pounder with Cheese,Fast Food,741,532,t-mcdonalds-Quarter-Pounder-with-Cheese.jpg,"bun, processed cheese, ketchup, pickles, onion, mustard, beef patty",filling
+88,Roti John,Indian Coffee Shop,186,571,food88.png,"minced meat, onion, egg, tomato-chilli sauce, baguette-type loaf",filling
+89,Roti Prata (plain),Indian Coffee Shop,39,122,food89.png,"flour, water, salt",not so filling
+90,Roti Prata with egg,Indian Coffee Shop,120,289,food90.png,"flour, water, salt, egg",somewhat filling
+91,Siew Mai,Dim Sum Restaurant,33,105,food91.png,"flour, pork , shrimp",not so filling
+92,Soon Kueh,Dim Sum Restaurant,30,98,food92.png,"rice flour, tapioca starch, yam bean, carrot, mushrooms",not so filling
+93,Spaghetti with Meat Sauce,Western Diner,348,240,food93.png,"ground beef, onion, garlic, green pepper, tomato",not so filling
+94,Spicy Chicken McWrap,Fast Food,728,544,food94.png,"Whole grain tortilla, spicy fried chicken cutlet, lettuce, tomatoes",filling
+95,Tau Suan with you tiao,Chinese Hawker,107,293,food95.jfif,"mung beans, pandan leaves, sugar",somewhat filling
+96,Tom Yam Seafood Soup,Chinese Restaurant,297,271,food96.jfif,"lemongrass, shallots, tomato, fish sauce, mushrooms, squid, prawn",somewhat filling
+97,"Wanton Noodles, Dry",Dim Sum Restaurant,563,409,food97.jfif,"egg noodles, choy sum, char siu pork, ground pork, chilli sauce",somewhat filling
+98,"Wanton Noodles, Soup",Dim Sum Restaurant,270,217,food98.jfif,"egg noodles, choy sum, char siu pork, ground pork",not so filling
+99,Watercress & Pork Ribs Soup,Chinese Restaurant,86,92,food99.jpg,"watercress, pork ribs, dried red dates",not so filling
+100,Yam Cake,Dim Sum Restaurant,65,174,food100.jpeg,"rice flour, vegetable taro, dried prawns ",not so filling
+101,Yong Tauhu Soup,Chinese Restaurant,41,49,food101.jpg,"Soft bun, lettuce, beef patty x2, cheese",not so filling
+102,You Tiao,Chinese Restaurant,43,123,food102.png,"salt, butter, deep-fried dough",not so filling

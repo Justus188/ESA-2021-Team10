@@ -1,0 +1,31 @@
+"EventNumber","EventName","EventDescription","EventType","Calories"
+1,Gym Session,You have worked hard in the gym.  You burned 400 calories!,Good,-400
+2,Party,You attended your best friend's birthday party. You consumed 600 calories!,Bad,600
+3,Binge ,You were too stress about work. Let the binging begin. You consumed 450 calories!,Bad,450
+4,strolling,You took a 2 hour stroll with your pet dog and burned 200 calories!,Good,-200
+5,cycling,You cycled for an hour and burned 320 calories!,Good,-320
+6,brisk walk,You brisk walk for an hour and burned 350 calories!,Good,-350
+7,swimming,You swimmed for an hour and burned 450 calories!,Good,-450
+8,Climbing the stairs,You burned 100 calories by climbing 7 flights of stairs!,Good,-100
+9,Climbing the stairs,You burned 200 calories by climbing 14 flights of stairs!,Good,-200
+10,Climbing the stairs,You burned 300 calories by climbing 21 flights of stairs!,Good,-300
+11,strolling,You took a 1 hour stroll and burned 100 calories!,Good,-100
+12,cycling,You cycled for an hour and burned 600 calories!,Good,-600
+13,yoga,You did yoga for an hour and burned 202 calories!,Good,-202
+14,Aerobic exercise,You did aerobic exercises for an hour and burned 384 calories!,Good,-384
+15,Badminton,You played badminton for an hour and burned 288 calories!,Good,-288
+16,Football,You played competitive football with your friends and burned 531 calories!,Good,-531
+17,Supper,You went out for supper with your friends and consumed 300 calories!,Bad,300
+18,Food festival,You went to the Singapore food festival and consumed 600 calories!,Bad,600
+19,It's your Birthday,It is your birthday and you consumed a whole cake all by yourself. You consumed 600 calories!,Bad,600
+20,BBQ party ,"To celebrate the last day of school, you attended a BBQ party with your friends.You consumed 500 calories!",Bad,500
+21,Supper,It is late at night but you couldn't fall asleep and feel hungry so you cooked cup noodles for yourself. You consumed 222 calories!,Bad,222
+22,Housewarming party,You attended your cousin's housewarming party and you consumed 400 calories!,Bad,400
+23,Carnival ,You went to a carnival with your friends and ate many junk food! You consumed 300 calories!,Bad,300
+24,PizzaFest,You went to a pizzafest with your friends and consumed 300 calories!,Bad,400
+25,Spring cleaning,You burned 202 calories by sweeping and mopping the floor!,Good,-202
+26,Cravings,You consumed a doughnut as you have a sudden craving for sweet food. You consumed 289 calories!,Bad,289
+27,Stress,You were too stress about work. Let the binging begin. You consumed 240 calories!,Bad,240
+28,Picnic party,You attended a picnic party with your friends and consumed 222 calories!,Bad,222
+29,cocktail party,You went to a cocktail party after you completed your project. You consumed 450 calories!,Bad,450
+30,Wedding party,You attended your friend's wedding party and consumed 340 calories!,Bad,340
