@@ -143,6 +143,15 @@ ui <- dashboardPage( ###########################################################
                          ),
                          tabItem(tabName = "leaderboard", 
                                  h2("Hall of Fame"),
+                                 # conditionalPanel(
+                                 #   condition="output.recent_game==true",
+                                 #   textOuput("recent_score"),
+                                 #   actionButton("publish", "Publish Your Score!")
+                                 # ),
+                                 # conditionalPanel(
+                                 #   condition="output.recent_publish==true",
+                                 #   textOutput("pubilish_success")
+                                 # ),
                                  box(
                                    title = "See where you stand!",width=12,
                                    tableOutput("leaderboard"),
@@ -200,16 +209,15 @@ server <- function(input, output, session) {####################################
   leaderBoard <- renderTable({input$name.done; getLeaderBoard()}) #pregenerate leaderboard for use in multiple screens
   
   ### Regenerate on new game # Shift to start() later ##########################
-  isEvent <- matrix(runif(100, 0,1) <0.2, byrow=T, nrow=10) # matrix[row+1, col+1] of isEvent tile
-  
   vals <- reactiveValues(calories = 0,
                          hunger = 2000,
                          dieNumber = 6,
                          boardstate = -1,
+                         isEvent = NA, # generated on start
                          playerpos = c(9, 9), # (row,col) track token location; each edge has length 10 starting from (10,10), ends(9,10)
                          QuestionNo = NULL,
                          event_no = NULL,
-                         action.log = data.frame(Event="Start", Calories=0, Hunger=2000),
+                         action.log = NA, # generated on start
                          ### Trackers for conditional statements
                          turndiff = 0,
                          startbuttons = rep(0,4) #TODO: Update if changing number of start buttons
@@ -261,8 +269,8 @@ server <- function(input, output, session) {####################################
   # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
   output$playertokenimg <- renderUI(img(src = getTokenSrc(input), height=50, width=50))
   
-  observe({vals$playerpos
-    mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input, isEvent)}, x=listofcells, y=genCellIds())
+  observeEvent(c(vals$playerpos, vals$isEvent),{
+    mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input, vals$isEvent)}, x=listofcells, y=genCellIds())
   })
   
   output$hunger_scale <- renderImage(list(src = paste0("www/hunger", min(as.integer(7-vals$hunger/1000),1), ".png")), deleteFile=F)
@@ -291,6 +299,15 @@ server <- function(input, output, session) {####################################
     if (length(diff) != 0) { # if button that was pressed is bigger than 0
       removeModal()
       # Reinitialise variables; TODO: Implement once gameboard is conditionally hidden by start_welcome
+      
+      vals$isEvent <- matrix(runif(100, 0,1) <0.2, byrow=T, nrow=10) # matrix[row+1, col+1] of isEvent tile 
+      vals$isEvent[9,10] <- F
+      vals$calories <- 0
+      vals$hunger <- 2000
+      vals$dieNumber <- 6
+      vals$boardstate <- -1
+      vals$playerpos <- c(9, 9)
+      
       updateTabItems(session, "tabSelect", "gameboard")
       print("Starting game")
     }
@@ -319,7 +336,7 @@ server <- function(input, output, session) {####################################
       
       print(paste0("Die rolled: ", vals$dieNumber, ", Player Pos: ", vals$playerpos[1], vals$playerpos[2])) ### DEBUG
       
-      vals$boardstate <- checktile(currentrow, currentcol, isEvent) # Boardstates: -1: Dice, 0 Event, 1 Restaurant, 2 End
+      vals$boardstate <- checktile(currentrow, currentcol, vals$isEvent) # Boardstates: -1: Dice, 0 Event, 1 Restaurant, 2 End
       if(vals$boardstate ==2) showModal(endModal())
     }
   })
@@ -353,7 +370,7 @@ server <- function(input, output, session) {####################################
   })
   
   ### Event logic
-  observe({if (vals$boardstate==0){ # Should observe for the user's position in the game == event tile's position
+  observeEvent(vals$boardstate,{if (vals$boardstate==0){ # Should observe for the user's position in the game == event tile's position
     vals$QuestionNo <- getRandQuestionNo()
     
     output$EventPage1 <- renderUI({
@@ -450,7 +467,7 @@ server <- function(input, output, session) {####################################
   
   ### endModal renders
   output$actionlog <- renderTable(vals$action.log)
-  output$leaderboard_endModal <- leaderBoard
+  observeEvent(input$goto_leaderboard, updateTabItems(session, "tabSelect", "leaderboard"))
   output$leaderboard_publishedModal <- leaderBoard
   
   ### Publish

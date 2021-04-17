@@ -40,14 +40,12 @@ publishScore <- function(name, calories){
 ## Modals:
 endModal <- function() {modalDialog(
   title = "The End!",
-  "Congratulations! Here is a summary of what you ate this run!",
+  "Congratulations! Here is a summary of what you did this run!",
   tableOutput("actionlog"),
-  "Here's how other players did!",
-  tableOutput("leaderboard_endModal"),
   footer = tagList(
     actionButton("quit_endModal", "Quit"),
     actionButton("start_endModal", "Restart"),
-    actionButton("publish", "Publish Your Score!")
+    actionButton("goto_leaderboard", "Check out the Leaderboard!")
   )
 )}
 
