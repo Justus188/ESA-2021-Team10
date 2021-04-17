@@ -58,3 +58,33 @@ nameModal <- function(){modalDialog(
     actionButton("name.done", "That's my name!")
   )
 )}
+
+### Helper Functions
+createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="50px", width = "50px", inline = T))
+createRow <- function(i) return(lapply(0:9, createTile, i = i))
+genCellIds <- function(){
+  initIds = as.character(0:99)
+  initIds[1:10] <- paste0("0", initIds[1:10])
+  initIds
+}
+renderCell <- function(playerpos, cellid, input, isEvent){
+  # Renders token if occupied, else empty
+  row <- as.integer(substr(cellid, 1,1))
+  col <- as.integer(substr(cellid, 2,2))
+  
+  renderImage({
+    imgsrc <- "www/Blank.png" #Blank
+    if ((row %in% c(0,9)) || (col %in% c(0,9))) {
+      if(playerpos[1] == row && playerpos[2] == col) {
+        imgsrc <- paste0("www/",getTokenSrc(input))
+      } else if (isEvent[row+1, col+1]){
+        #some event picture
+        imgsrc <- "www/eventTilepic.png"
+      }
+    }
+    # Unfortunately, we are not able to re-size the image and still have the click event work.
+    # So the image files must have exactly the size we want.
+    # Also, z-order works only if 'position' is set.
+    list(src=imgsrc,style="position:relative;z-order:999;")
+  },deleteFile=FALSE)
+}

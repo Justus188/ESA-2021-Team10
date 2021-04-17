@@ -3,57 +3,6 @@ source("event.R")
 source("restaurant+movement.R")
 library(shiny)
 library(shinydashboard)
-#library(reactlog)
-#reactlog::reactlog_enable()
-
-# retrieve 5 random food from database, store their respective names, images, ingredient list,
-# and filling levels in dataframe
-food1name = "Filet-O-fish"    # for testing
-food2name = "McSpicy"         # for testing
-food3name = "McChicken"       # for testing
-food4name = "Cheese Burger"   # for testing
-food5name = "McWrap"          # for testing
-
-food1_image = "FOF.png"                                      # for testing
-food2_image = "food_main_mcspicy.png"                        # for testing
-food3_image = "McChicken.png"                                # for testing
-food4_image = "cheeseburger.png"                             # for testing
-food5_image = "mcwrapgrilled.png"                            # for testing
-food1_ingredients = "Fish fillet, cheese, buns"              # for testing
-food2_ingredients = "Spicy Chicken fillet, lettuce, buns"    # for testing
-food3_ingredients = "Chicken fillet, lettuce, buns"          # for testing
-food4_ingredients = "Beef patty, cheese, pickles, buns"      # for testing
-food5_ingredients = "Grilled chicken, lettuce, tortilla"     # for testing
-
-### Helpers ####################################################################
-createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="50px", width = "50px", inline = T))
-createRow <- function(i) return(lapply(0:9, createTile, i = i))
-genCellIds <- function(){
-  initIds = as.character(0:99)
-  initIds[1:10] <- paste0("0", initIds[1:10])
-  initIds
-}
-renderCell <- function(playerpos, cellid, input, isEvent){
-  # Renders token if occupied, else empty
-  row <- as.integer(substr(cellid, 1,1))
-  col <- as.integer(substr(cellid, 2,2))
-  
-  renderImage({
-    imgsrc <- "www/Blank.png" #Blank
-    if ((row %in% c(0,9)) || (col %in% c(0,9))) {
-      if(playerpos[1] == row && playerpos[2] == col) {
-        imgsrc <- paste0("www/",getTokenSrc(input))
-      } else if (isEvent[row+1, col+1]){
-        #some event picture
-        imgsrc <- "www/eventTilepic.png"
-      }
-    }
-    # Unfortunately, we are not able to re-size the image and still have the click event work.
-    # So the image files must have exactly the size we want.
-    # Also, z-order works only if 'position' is set.
-    list(src=imgsrc,style="position:relative;z-order:999;")
-  },deleteFile=FALSE)
-}
 
 ui <- dashboardPage( ###########################################################
          dashboardHeader(title = "CARElorie"),
@@ -89,12 +38,12 @@ ui <- dashboardPage( ###########################################################
              ),
              tabItem(tabName = "gameboard",
                      h2("CARElorie"),
-                     h2("Start the game by clicking the die on the right"),
+                     h4("Start the game by clicking the die on the right"),
                      sidebarLayout( 
                        # the trick here is to make the gameboard image 'position:absolute;z-order:0'; 
                        # Then, to superimpose images, style them to be 'position:relative;z-order:999'
                        mainPanel(width=7,
-                                 img(src='board.png',style="position:absolute;z-order:0",width="525px",height="505px"),
+                                 img(src='board.png',style="position:absolute;z-order:0",width="525px",height="500px"),
                                  createRow(0), tags$br(),
                                  createRow(1), tags$br(),
                                  createRow(2), tags$br(),
@@ -112,6 +61,7 @@ ui <- dashboardPage( ###########################################################
                                      conditionalPanel(
                                        condition = "output.dice == true",
                                        "Click on the dice to roll for your movement this turn!",
+                                       tags$br(),
                                        imageOutput("die",height="100px",width="100px",click=clickOpts("clickdie", clip=F),inline=TRUE)
                                      ),
                                      
@@ -142,12 +92,15 @@ ui <- dashboardPage( ###########################################################
                      h2("Hall of Fame"),
                      conditionalPanel(
                        condition="output.recent_game_toggle ==true",
-                       textOutput("recent_game"),
-                       actionButton("publish", "Publish Your Score!")
+                       box(
+                         "Your most recent score is",
+                         uiOutput("recent_game"),
+                         actionButton("publish", "Publish Your Score!")
+                       )
                      ),
                      conditionalPanel(
                        condition="output.recent_publish_toggle ==true",
-                       textOutput("pubilish_success")
+                       box(textOutput("pubilish_success"))
                      ),
                      box(
                        title = "See where you stand!",width=12,
@@ -208,52 +161,6 @@ server <- function(input, output, session) {####################################
                          recent_publish = NA
           )
   
-  ### WORK IN PROGRESS: TO SHIFT DOWN EVENTUALLY ###############################
-  
-  
-  # output$img1 <- renderUI({
-  #   if(input$Chosenfood == food1name){
-  #     img(src = food1_image,height = 200, width = 200)}
-  #   else if(input$Chosenfood == food2name){
-  #     img(src = food2_image, height = 200, width = 200)}
-  #   else if(input$Chosenfood == food3name){
-  #     img(src = food3_image,height = 200, width = 200)}
-  #   else if(input$Chosenfood == food4name){
-  #     img(src = food4_image,height = 200, width = 200)}
-  #   else if(input$Chosenfood == food5name){
-  #     img(src = food5_image,height = 200, width = 200)}
-  # })
-  
-
-  
-  # output$foodingredients <- renderText({
-  #   if(input$Chosenfood == food1name){
-  #     paste("Main ingredients:", food1_ingredients)}
-  #   else if(input$Chosenfood == food2name){
-  #     paste("Main ingredients:", food2_ingredients)}
-  #   else if(input$Chosenfood == food3name){
-  #     paste("Main ingredients:", food3_ingredients)}
-  #   else if(input$Chosenfood == food4name){
-  #     paste("Main ingredients:", food4_ingredients)}
-  #   else if(input$Chosenfood == food5name){
-  #     paste("Main ingredients:", food5_ingredients)}
-  # })
-  
-  # output$fillinglevel <- renderText({
-  #   if(input$Chosenfood == food1name){
-  #     paste("Fullness factor:??")}
-  #   else if(input$Chosenfood == food2name){
-  #     paste("Fullness factor:??")}
-  #   else if(input$Chosenfood == food3name){
-  #     paste("Fullness factor:??")}
-  #   else if(input$Chosenfood == food4name){
-  #     paste("Fullness factor:??")}
-  #   else if(input$Chosenfood == food5name){
-  #     paste("Fullness factor:??")}
-  #   
-  # })
-  
-  
   ### RENDERING FUNCTIONS ######################################################
   # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
   output$playertokenimg <- renderUI(img(src = getTokenSrc(input), height=50, width=50))
@@ -297,6 +204,7 @@ server <- function(input, output, session) {####################################
       vals$hunger <- 2000
       vals$dieNumber <- 6
       vals$boardstate <- -1
+      vals$turndiff <- 0
       vals$playerpos <- c(9, 9)
       vals$action.log <- data.frame(Event="Start", Calories=0, Hunger=2000)
       
@@ -349,7 +257,7 @@ server <- function(input, output, session) {####################################
   
   # Conditional Panels for leaderboard tab
   output$recent_game_toggle <- reactive(!is.na(vals$recent_score))
-  output$recent_game <- renderText(paste("Your most recent score is", vals$recent_score))
+  output$recent_game <- renderUI(h1(vals$recent_score))
   
   output$recent_publish_toggle <- reactive(!is.na(vals$recent_publish))
   output$publish_success <- renderText(paste("Successfully published", vals$recent_publish, "to leaderboard!"))
@@ -464,7 +372,7 @@ server <- function(input, output, session) {####################################
     #Set up Page3
     output$EventPage3 <- renderUI({
       tagList(
-        tags$h2(getEventName(vals$event_no)),
+        tags$h2(str_to_title(getEventName(vals$event_no))),
         tags$h4(getEventDescription(vals$event_no)),
         actionButton(inputId="continuebutton", label="Continue")
       )}) 
