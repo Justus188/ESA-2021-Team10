@@ -449,7 +449,7 @@ server <- function(input, output, session) {####################################
     output$EventPage3 <- renderUI({
       tagList(
         tags$h2(getEventName(vals$event_no)),
-        tags$h2(getEventDescription(vals$event_no)),
+        tags$b(getEventDescription(vals$event_no)),
         actionButton(inputId="continuebutton", label="Continue")
       )}) 
   })
