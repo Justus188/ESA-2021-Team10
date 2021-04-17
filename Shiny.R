@@ -75,7 +75,16 @@ ui <- dashboardPage( ###########################################################
                      h2("Start the game by choosing your player token and clicking on the Start button!"),
                      tags$br(),
                      tags$h4("Instructions"),
-                     tags$p(" INSERT INSTRUCTIONS "), #TODO: Update this
+                     tags$p(HTML('Objective: To go around the gameboard making food choices that you think will give you the lowest calorie count and at the same time learning more about nutrition by answering random nutritional-related questions. 
+<br/>Instructions:
+<br/>1. Get ready at starting position
+<br/>2. Roll the dice on the right side of the screen to move forward
+<br/>3. If you land on a restaurant tile (yellow tile) :
+<br/>The menu of a random restaurant will appear on the right side, you can browse through the menu, look through the main ingredients and filling level of each food and make a choice to either pick a food you think has the lowest calorie on the menu to eat or not eat anything.
+<br/>4. When you consume a food item, your hunger level will decrease but if you choose not to consume anything, your hunger level will increase. If your hunger level reaches too high (as indicated by the red portion on the hunger meter on the top right-hand corner of the gameboard), you will be forced to eat unhealthy food which will result in a large increase in your calorie count!
+<br/>5. If you land on an event tile (blue tile) :
+<br/>You will have to answer a nutritional-related question. If you answer correctly, a random "good" event will occur, which will help you to lower your total calorie count, however, if you answer incorrectly, a random "bad" event will occur, which will result in an increase in your total calorie count.
+<br/>6. Try to reach the endpoint with the lowest calorie count!')),
                      actionButton("start_welcome", "Start the Game!")
              ),
              tabItem(tabName = "gameboard",
@@ -109,16 +118,11 @@ ui <- dashboardPage( ###########################################################
                                      # Only show this panel if land on restaurant tile
                                      conditionalPanel(
                                        condition = "output.restaurant == true",
-                                       tags$h1("Menu"), # change the food names to random 5 food names from database
-                                       #selectInput(inputId = "Chosenfood", 
-                                       #            label = "Please choose something:",   
-                                       #            getMenu()[,"Food"]
-                                       #),
-                                       textOutput("foodtype"),
+                                       tags$h1("Menu"),
                                        uiOutput("choosemenu"),
                                        uiOutput("foodimg"),
-                                       textOutput("foodingredients"),
-                                       textOutput("fillinglevel"),
+                                       uiOutput("foodingredients"),
+                                       uiOutput("fillinglevel"),
                                        actionButton("choosefood_yes","ok")
                                      ),
                                      
@@ -182,7 +186,7 @@ ui <- dashboardPage( ###########################################################
 server <- function(input, output, session) {####################################
   ### Init variables ###########################################################
   # Static variables
-  allmenu <- rbind(getallMenu(),c(-1,"Eat Nothing",0,0,0,"Blank.png",0,0)) #df with all menu items
+  allmenu <- rbind(getallMenu(),c(-1,"Nothing","Your weighing scale weighs heavily on your mind...",0,0,"Blank.png","Air","A tiny bit")) #df with all menu items
   cellIds <- genCellIds()
   listofcells <- lapply(cellIds, function(x) return(paste0("cell", x)))
   
@@ -220,23 +224,7 @@ server <- function(input, output, session) {####################################
   #     img(src = food5_image,height = 200, width = 200)}
   # })
   
-  output$foodimg <- renderUI({
-    img(src = allmenu[allmenu$Food == input$Chosenfood,"FoodImage"],height = 200,width = 200)
-  })
-  
-  output$foodingredients <- renderText({
-    paste("Main ingredients:",allmenu[allmenu$Food == input$Chosenfood,"Ingredients"])
-  })
-  
-  output$fillinglevel <- renderText({
-    paste("Filling level:",allmenu[allmenu$Food == input$Chosenfood,"Filling"])
-  })
-  
-  output$foodtype <- renderText({
-    if(input$Chosenfood == "Nothing"){
-      " "
-    } else {paste("Restaurant Type:",allmenu[allmenu$Food == input$Chosenfood,"Foodtype"])}
-  })
+
   
   # output$foodingredients <- renderText({
   #   if(input$Chosenfood == food1name){
@@ -373,18 +361,26 @@ server <- function(input, output, session) {####################################
   output$choosemenu <- renderUI({
     selectInput(
       "Chosenfood",
-      "Choose food",
+      vals$menu[1, "Foodtype"],
       vals$menu[,"Food"]
     )
   })
-
+  
+  output$foodimg <- renderUI(img(src = allmenu[allmenu$Food == input$Chosenfood,"FoodImage"],height = 200,width = 200))
+  
+  output$foodingredients <- renderUI(HTML(paste(strong("Main ingredients:"),
+                                                str_to_title(allmenu[allmenu$Food == input$Chosenfood,"Ingredients"]))))
+  
+  output$fillinglevel <- renderUI(HTML(paste(strong("Filling level :"),
+                                             str_to_title(allmenu[allmenu$Food == input$Chosenfood,"Filling"]))))
+  
   observeEvent(input$choosefood_yes,{ # Choose food -> update stats
     newCalories <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Calories"])
     newHunger <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Hunger"])
     
     vals$calories <- vals$calories + newCalories
     vals$hunger <- vals$hunger + newHunger
-    vals$action.log <- add_row(vals$action.log, Event=paste("Ate", input$Chosenfood), Calories=newCalories, Hunger=newHunger)
+    vals$action.log <- add_row(vals$action.log, Event=paste("Consumed", input$Chosenfood), Calories=newCalories, Hunger=newHunger)
     
     vals$turndiff <- vals$turndiff -1 # End of action phase
     vals$boardstate <- -1             # Set state to movement
@@ -423,7 +419,7 @@ server <- function(input, output, session) {####################################
           radioButtons(inputId="selectedAns",
                        label=getQuestionStatement(vals$QuestionNo),
                        choices = c("TRUE", "FALSE")),
-          tags$b(getQuestionExplanation(vals$QuestionNo)),
+          getQuestionExplanation(vals$QuestionNo),
           br(),
           tags$b("Answer is Correct! Press proceed to continue"),
           actionButton(inputId="proceedbutton", label="Proceed!"))})
@@ -444,7 +440,7 @@ server <- function(input, output, session) {####################################
           radioButtons(inputId="selectedAns",
                        label=getQuestionStatement(vals$QuestionNo),
                        choices = c("TRUE", "FALSE")),
-          tags$b(getQuestionExplanation(vals$QuestionNo)),
+          getQuestionExplanation(vals$QuestionNo),
           br(),
           tags$b("Answer is Incorrect! Press proceed to continue"),
           actionButton(inputId="proceedbutton", label="Proceed!"))})
@@ -458,11 +454,9 @@ server <- function(input, output, session) {####################################
     
     #Should add in parts to modify Hunger, Calories.
     newCalories <- getEventCalories(vals$event_no)
-    newHunger <- getEventHunger(vals$event_no)
     
     vals$calories = vals$calories + newCalories
-    vals$hunger = vals$hunger + newHunger
-    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=newHunger)
+    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=0)
     
     #Clear Page2
     output$EventPage2 <- renderUI(NULL)
@@ -471,7 +465,7 @@ server <- function(input, output, session) {####################################
     output$EventPage3 <- renderUI({
       tagList(
         tags$h2(getEventName(vals$event_no)),
-        tags$h2(getEventDescription(vals$event_no)),
+        tags$h4(getEventDescription(vals$event_no)),
         actionButton(inputId="continuebutton", label="Continue")
       )}) 
   })

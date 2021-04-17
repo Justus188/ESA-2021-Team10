@@ -28,10 +28,8 @@ getMenu <- function(){
   query <- paste0("SELECT * FROM CarelorieMenu WHERE Foodtype = '" ,selectedfoodtype,"' ORDER BY RAND() LIMIT 5")
   selectedmenu <- getQuery(query)
   
-  selectedmenu <- rbind(selectedmenu,c(-1,"Nothing",0,0,0,"Blank.png",0,0))
+  selectedmenu <- rbind(selectedmenu,c(-1,"Nothing","Your weighing scale weighs heavily on your mind...",0,0,"Blank.png","Air","A tiny bit"))
 }
-
-
 
 starvingModal <- function(){
   modalDialog(
