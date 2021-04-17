@@ -1,8 +1,233 @@
-source("lastTile.R")
-source("event.R")
-source("restaurant+movement.R")
-library(shiny)
-library(shinydashboard)
+for (pkg in c("shiny", "DBI", "shinydashboard", "shinybusy", "tidyverse")) library(pkg, character.only=T)
+
+### Helper Functions ###########################################################
+### General Helpers
+getAWSConnection <- function(){
+  dbConnect(
+    drv = RMySQL::MySQL(),
+    dbname = "student061",
+    host = "esddbinstance-1.ceo4ehzjeeg0.ap-southeast-1.rds.amazonaws.com",
+    username = "student061",
+    password = "Uuzk84Yf")
+}
+
+getQuery <- function(query) {
+  conn <- getAWSConnection()
+  result <- dbGetQuery(conn, query)
+  dbDisconnect(conn)
+  result
+}
+
+createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="50px", width = "50px", inline = T))
+
+createRow <- function(i) return(lapply(0:9, createTile, i = i))
+
+genCellIds <- function(){
+  initIds = as.character(0:99)
+  initIds[1:10] <- paste0("0", initIds[1:10])
+  initIds
+}
+
+renderCell <- function(playerpos, cellid, input, isEvent){
+  # Renders token if occupied, else empty
+  row <- as.integer(substr(cellid, 1,1))
+  col <- as.integer(substr(cellid, 2,2))
+  
+  renderImage({
+    imgsrc <- "www/Blank.png" #Blank
+    if ((row %in% c(0,9)) || (col %in% c(0,9))) {
+      if(playerpos[1] == row && playerpos[2] == col) {
+        imgsrc <- paste0("www/",getTokenSrc(input))
+      } else if (isEvent[row+1, col+1]){
+        #some event picture
+        imgsrc <- "www/eventTilepic.png"
+      }
+    }
+    # Unfortunately, we are not able to re-size the image and still have the click event work.
+    # So the image files must have exactly the size we want.
+    # Also, z-order works only if 'position' is set.
+    list(src=imgsrc,style="position:relative;z-order:999;")
+  },deleteFile=FALSE)
+}
+
+getTokenSrc <- function(input) return(paste0("token", switch(input$playertoken, "Burger"=1, "Fries"=2, "Apple"=3), ".png"))
+
+### Movement
+checktile <- function(row, col, isEvent) if (isEvent[row+1, col+1]) 0 else if (row==8 && col == 9) 2 else 1
+
+updateBoardState <- function(playerpos,dieNumber){
+  row <- playerpos[1]
+  col <- playerpos[2]
+  
+  if (row == 9 && col != 0){
+    col <- col - dieNumber
+    if (col < 0) {row <- row + col; col <- 0}
+  } else if (col == 0 && row != 0) {
+    row <- row - dieNumber
+    if (row<0) {col <- col - row; row <- 0}
+  } else if (row == 0 && col != 9){
+    col <- col + dieNumber
+    if (col > 9) {row <- row + col - 9; col <- 9}
+  } else if(col == 9) {
+    row <- row + dieNumber
+    if (row > 8) {row <- 8}
+  } else stop("DiceError: Something went wrong in restaurant+movement.R/updateBoardState")
+  
+  c(row, col)
+}
+
+### Restaurant
+getallMenu <- function(){
+  #extract a df of all menu items
+  query <- "SELECT * FROM CarelorieMenu"
+  getQuery(query)
+}
+
+getMenu <- function(){
+  # Extract random menu from database
+  allmenu <- getallMenu()
+  foodtype <- unique(allmenu$Foodtype)
+  selectedfoodtype <- sample(foodtype,1)
+  query <- paste0("SELECT * FROM CarelorieMenu WHERE Foodtype = '" ,selectedfoodtype,"' ORDER BY RAND() LIMIT 5")
+  selectedmenu <- getQuery(query)
+  
+  selectedmenu <- rbind(selectedmenu,c(-1,"Nothing","Your weighing scale weighs heavily on your mind...",0,0,"Blank.png","Air","A tiny bit"))
+}
+
+### Event
+getMaxNumberOfEvents <- function(){
+  query <- "SELECT MAX(EventNumber) FROM CarelorieEvents"
+  result <- getQuery(query)
+  as.numeric(result[[1]])
+}
+
+getEventName <- function(event_no){
+  query <- str_c("SELECT EventName FROM CarelorieEvents WHERE EventNumber=",event_no)
+  result <- getQuery(query)
+  as.character(result[[1]])
+}
+
+getEventDescription <- function(event_no){
+  query <- str_c("SELECT EventDescription FROM CarelorieEvents WHERE EventNumber=",event_no)
+  result <- getQuery(query)
+  as.character(result[[1]])
+}
+
+getEventType <- function(event_no){
+  query <- str_c("SELECT EventType FROM CarelorieEvents WHERE EventNumber=", event_no)
+  result <- getQuery(query)
+  as.numeric(result[[1]])
+}
+
+getRandQuestionNo <- function(){
+  query <- "SELECT QuestionNo FROM CarelorieQuestions ORDER BY RAND() LIMIT 1"
+  result <- getQuery(query)
+  
+  #Return the result
+  as.numeric(result[[1]])
+}
+
+getQuestionStatement <- function(qn_no){
+  query <- str_c("SELECT QuestionStatement FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
+  result <- getQuery(query)
+  
+  as.character(result[[1]])
+}
+
+checkAnswer <- function(qn_no,selected_ans){
+  query <- str_c("SELECT QuestionAnswer FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
+  result <- getQuery(query)
+  result <- as.character(result[[1]])
+  
+  if (selected_ans==result){
+    print("Check Result: Correct")
+    TRUE
+  }else if (selected_ans!=result){
+    print("Check Result: Wrong")
+    FALSE
+  }
+}
+
+getQuestionExplanation <- function(qn_no){
+  query <- str_c("SELECT QuestionExplanation FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
+  
+  result <- getQuery(query)
+  
+  as.character(result[[1]])
+}
+
+getEventCalories <- function(event_no){
+  query <- str_c("SELECT Calories FROM CarelorieEvents WHERE EventNumber=", event_no)
+  
+  result <- getQuery(query)
+  
+  as.numeric(result[[1]])
+}
+
+getEventHunger <- function(event_no){ #Unimplemented due to time constraints
+  query <- str_c("SELECT Hunger FROM CarelorieEvents WHERE EventNumber=", event_no)
+  
+  result <- getQuery(query)
+  
+  as.numeric(result[[1]])
+}
+
+getEventType <- function(event_no){
+  query <- str_c("SELECT EventType FROM CarelorieEvents WHERE EventNumber=", event_no)
+  
+  result <- getQuery(query)
+  
+  as.numeric(result[[1]])
+}
+
+### End of game
+
+getLeaderBoard <- function() getQuery("SELECT Player, Calories FROM CarelorieLeaderboard ORDER BY calories ASC LIMIT 10")
+
+getRandomPlayerName <- function() getQuery("SELECT * FROM LeaderRandomName")$playername[1]
+
+publishScore <- function(name, calories){
+  conn <- getAWSConnection()
+  query <- paste0("INSERT INTO CarelorieLeaderboard (Player, Calories) VALUES (?id1, ", calories, ")")
+  query <- sqlInterpolate(conn, query, id1=name)
+  print(query)
+  
+  nrows <- dbExecute(conn, query)
+  if(nrows!=1) print("writeLeaderBoard() inserted != 1 row. Something went wrong.")
+  
+  dbDisconnect(conn)
+}
+
+### Modals #####################################################################
+starvingModal <- function(){
+  modalDialog(
+    title = "You are starving. You have no choice but to stuff your face with food.",
+    footer = tagList(
+      actionButton("starvingok", "OK")
+    )
+  )
+}
+
+endModal <- function() {modalDialog(
+  title = "The End!",
+  "Congratulations! Here is a summary of what you did this run!",
+  tableOutput("actionlog"),
+  footer = tagList(
+    actionButton("quit_endModal", "Quit"),
+    actionButton("start_endModal", "Restart"),
+    actionButton("goto_leaderboard", "Check out the Leaderboard!")
+  )
+)}
+
+nameModal <- function(){modalDialog(
+  title = "Input your name!",
+  textInput("name.name", "Your name is: ", getRandomPlayerName()),
+  "(You can change it!)",
+  footer= tagList(
+    actionButton("quit_nameModal", "Quit"),
+    actionButton("name.done", "That's my name!")
+  )
+)}
 
 ui <- dashboardPage( ###########################################################
          dashboardHeader(title = "CARElorie"),
@@ -161,8 +386,7 @@ server <- function(input, output, session) {####################################
                          recent_publish = NA
           )
   
-  ### RENDERING FUNCTIONS ######################################################
-  # Code for displaying of the playertoken image in the mainpage, update & store the chosen token image for the rest of the game in line code 148 (after pressing start button)
+  ### Rendering Functions ######################################################
   output$playertokenimg <- renderUI(img(src = getTokenSrc(input), height=50, width=50))
   
   observeEvent(c(vals$playerpos, vals$isEvent),{
@@ -182,7 +406,7 @@ server <- function(input, output, session) {####################################
   
   output$leaderboard <- renderTable({input$name.done; getLeaderBoard()})
   
-  ### GAME LOGIC ###############################################################
+  ### Game Logic ###############################################################
   observeEvent(vals$in_progress, { # Hide gameboard if game not in progress
     if(vals$in_progress) output$gameboard_gated <- renderMenu(menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board")))
     else output$gameboard_gated <- NULL
