@@ -1,8 +1,8 @@
 # CARElorie
 An educational game about calorie counting written in R (Shiny) <br>
-Made for Engineering Systems Architecture course at Singapore University of Technology and Design
+Made for the Engineering Systems Architecture course at Singapore University of Technology and Design
 
-This repo was originally created to facilitate collaboration for the creation of this project, and with the project over it now serves as an archive of our work.
+This repo was originally created to facilitate collaboration for the creation of this project, and with the project over it now serves as an archive for our work.
 
 # Dependencies
 - DBI
