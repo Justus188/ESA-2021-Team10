@@ -114,6 +114,7 @@ ui <- dashboardPage( ###########################################################
                                        #            label = "Please choose something:",   
                                        #            getMenu()[,"Food"]
                                        #),
+                                       textOutput("foodtype"),
                                        uiOutput("choosemenu"),
                                        uiOutput("foodimg"),
                                        textOutput("foodingredients"),
@@ -231,6 +232,11 @@ server <- function(input, output, session) {####################################
     paste("Filling level:",allmenu[allmenu$Food == input$Chosenfood,"Filling"])
   })
   
+  output$foodtype <- renderText({
+    if(input$Chosenfood == "Nothing"){
+      " "
+    } else {paste("Restaurant Type:",allmenu[allmenu$Food == input$Chosenfood,"Foodtype"])}
+  })
   
   # output$foodingredients <- renderText({
   #   if(input$Chosenfood == food1name){
@@ -452,9 +458,11 @@ server <- function(input, output, session) {####################################
     
     #Should add in parts to modify Hunger, Calories.
     newCalories <- getEventCalories(vals$event_no)
+    newHunger <- getEventHunger(vals$event_no)
     
     vals$calories = vals$calories + newCalories
-    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=NA)
+    vals$hunger = vals$hunger + newHunger
+    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=newHunger)
     
     #Clear Page2
     output$EventPage2 <- renderUI(NULL)
