@@ -358,9 +358,10 @@ server <- function(input, output, session) {####################################
   
   ### Restaurant Logic
   observeEvent(input$choosefood_yes,{
-    allMenu <- getallMenu()
-    newCalories <- allmenu[allmenu$Food == input$Chosenfood,"Calories"]
-    newHunger <- allmenu[allmenu$Food == input$Chosenfood,"Hunger"]
+    allMenu <- rbind(getallMenu(),c(c("Eat Nothing",0,0,0,"Blank.png",-1)))
+    
+    newCalories <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Calories"])
+    newHunger <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Hunger"])
     
     vals$calories <- vals$calories + newCalories
     vals$hunger <- vals$hunger + newHunger
