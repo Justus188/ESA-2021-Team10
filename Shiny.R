@@ -61,8 +61,10 @@ ui <- dashboardPage( ###########################################################
                      dashboardSidebar(
                        sidebarMenu(
                          id = "tabSelect",
+                         selectInput("playertoken", "Select your player token:",c("Burger","Fries","Apple")),
+                         uiOutput("playertokenimg", align="center"),
                          menuItem("Welcome", tabName = "welcome", icon = icon("door-open")),
-                         menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board")),
+                         menuItemOutput("gameboard_gated"),
                          menuItem("Leaderboard",tabName = "leaderboard", icon=icon("trophy")),
                          menuItem("Credits", tabName = "credits", icon=icon("align-justify"))                        
                        )
@@ -73,8 +75,6 @@ ui <- dashboardPage( ###########################################################
                                  h1("Welcome to CARElorie!"),
                                  h2("Start the game by choosing your player token and clicking on the Start button!"),
                                  tags$br(),
-                                 selectInput("playertoken", "Select your player token:",c("Burger","Fries","Apple")),
-                                 uiOutput("playertokenimg"),
                                  tags$h4("Instructions"),
                                  tags$p(" INSERT INSTRUCTIONS "), #TODO: Update this
                                  actionButton("start_welcome", "Start the Game!"),
@@ -204,12 +204,15 @@ server <- function(input, output, session) {####################################
   vals <- reactiveValues(calories = 0,
                          hunger = 2000,
                          dieNumber = 6,
-                         QuestionNo = NULL,
-                         event_no = NULL,
                          boardstate = -1,
                          playerpos = c(9, 9), # (row,col) track token location; each edge has length 10 starting from (10,10), ends(9,10)
+                         QuestionNo = NULL,
+                         event_no = NULL,
                          action.log = data.frame(Event="Start", Calories=0, Hunger=2000),
-                         turndiff = 0)
+                         ### Trackers for conditional statements
+                         turndiff = 0,
+                         startbuttons = rep(0,4) #TODO: Update if changing number of start buttons
+          )
   
   ### WORK IN PROGRESS: TO SHIFT DOWN EVENTUALLY ###############################
   output$img1 <- renderUI({
@@ -275,12 +278,24 @@ server <- function(input, output, session) {####################################
   output$leaderboard <- leaderBoard
   
   ### GAME LOGIC ###############################################################
-  # observe(if(any(c(input$start_welcome, input$start_leaderboard, input$start_endModal, input$start_publishedModal)>0)){ #TODO: Fix newly generated buttons prematurely firing if another button is previously used
-  #   removeModal()
-  #   # Reinitialise variables; TODO: Implement once gameboard is conditionally hidden by start_welcome
-  #   updateTabItems(session, "tabSelect", "gameboard")
-  #   print("Starting game")
-  # })
+  output$gameboard_gated <- renderMenu({
+    if(any(c(input$start_welcome, input$start_leaderboard)>0)) menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board"))
+  })
+  
+  observe({ # Start game button
+    curr_start_buttons <- c(input$start_welcome, input$start_leaderboard, input$start_endModal, input$start_publishedModal)
+    curr_start_buttons[is.na(curr_start_buttons)] <- 0
+    diff <- which(curr_start_buttons - vals$startbuttons == 1)
+    
+    if (length(diff) != 0) { # if button that was pressed is bigger than 0
+      removeModal()
+      # Reinitialise variables; TODO: Implement once gameboard is conditionally hidden by start_welcome
+      updateTabItems(session, "tabSelect", "gameboard")
+      print("Starting game")
+    }
+    
+    isolate(vals$startbuttons <- curr_start_buttons)
+  })
   
   observeEvent(input$clickdie,{ #TODO: Implement a counter to click spam
     if (vals$turndiff == 0){
@@ -288,7 +303,7 @@ server <- function(input, output, session) {####################################
       vals$dieNumber = as.integer(runif(1,1,7))
       vals$playerpos <- updateBoardState(vals$playerpos,vals$dieNumber)
       vals$hunger <- vals$hunger - 100*vals$dieNumber
-      vals$action.log <- add_row(vals$action.log, Event=paste("Travelled", vals$dieNumber, "tiles", Calories = 0, Hunger = -100*vals$dieNumber))
+      vals$action.log <- add_row(vals$action.log, Event=paste("Travelled", vals$dieNumber, "tiles"), Calories = 0, Hunger = -100*vals$dieNumber)
       
       if (vals$hunger<0) { #check for starving
         showModal(starvingModal())
