@@ -220,7 +220,7 @@ server <- function(input, output, session) {####################################
                          action.log = NA, # generated on start
                          ### Trackers for conditional statements
                          turndiff = 0,
-                         startbuttons = rep(0,4), #TODO: Update if changing number of start buttons
+                         startbuttons = rep(0,3), #TODO: Update if changing number of start buttons
                          lastbutton_start = F,
                          recent_score = NA,
                          recent_publish = NA
@@ -296,7 +296,7 @@ server <- function(input, output, session) {####################################
   
   observe({ # Start game button
     vals$lastbutton_start <- T
-    curr_start_buttons <- c(input$start_welcome, input$start_leaderboard, input$start_endModal, input$start_publishedModal)
+    curr_start_buttons <- c(input$start_welcome, input$start_leaderboard, input$start_endModal)
     curr_start_buttons[is.na(curr_start_buttons)] <- 0
     diff <- which(curr_start_buttons - vals$startbuttons == 1)
     
@@ -473,8 +473,7 @@ server <- function(input, output, session) {####################################
         tags$h2(getEventDescription(vals$event_no)),
         actionButton(inputId="continuebutton", label="Continue")
       )}) 
-  }
-  )
+  })
   
   observeEvent(input$continuebutton,{
     output$EventPage3 <- renderUI(NULL)
@@ -488,7 +487,6 @@ server <- function(input, output, session) {####################################
     vals$lastbutton_start <- F
     updateTabItems(session, "tabSelect", "leaderboard")
   })
-  output$leaderboard_publishedModal <- leaderBoard
 
   ### Publish
   observeEvent(input$publish, showModal(nameModal())) # Get player name
@@ -496,7 +494,7 @@ server <- function(input, output, session) {####################################
     publishScore(input$name.name, vals$calories)
     vals$recent_score <- NA
     vals$recent_publish <- input$name.name
-    showModal(publishedModal())
+    updateTabItems(session, "tabSelect", "leaderboard")
   })
   
   ### Quit correctly
