@@ -115,6 +115,7 @@ ui <- dashboardPage( ###########################################################
                                        #            label = "Please choose something:",   
                                        #            getMenu()[,"Food"]
                                        #),
+                                       textOutput("foodtype"),
                                        uiOutput("choosemenu"),
                                        uiOutput("foodimg"),
                                        textOutput("foodingredients"),
@@ -182,7 +183,7 @@ ui <- dashboardPage( ###########################################################
 server <- function(input, output, session) {####################################
   ### Init variables ###########################################################
   # Static variables
-  allmenu <- rbind(getallMenu(),c(-1,"Eat Nothing",0,0,0,"Blank.png",0,0)) #df with all menu items
+  allmenu <- rbind(getallMenu(),c(-1,"Nothing",0,0,0,"Blank.png","NA","You ate nothing")) #df with all menu items
   
   # Reactive variables
   vals <- reactiveValues(calories = 0,            ### Game variables, generated on start()
@@ -230,6 +231,11 @@ server <- function(input, output, session) {####################################
     paste("Filling level:",allmenu[allmenu$Food == input$Chosenfood,"Filling"])
   })
   
+  output$foodtype <- renderText({
+    if(input$Chosenfood == "Nothing"){
+      " "
+    } else {paste("Restaurant Type:",allmenu[allmenu$Food == input$Chosenfood,"Foodtype"])}
+  })
   
   # output$foodingredients <- renderText({
   #   if(input$Chosenfood == food1name){
@@ -451,9 +457,11 @@ server <- function(input, output, session) {####################################
     
     #Should add in parts to modify Hunger, Calories.
     newCalories <- getEventCalories(vals$event_no)
+    newHunger <- getEventHunger(vals$event_no)
     
     vals$calories = vals$calories + newCalories
-    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=NA)
+    vals$hunger = vals$hunger + newHunger
+    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=newHunger)
     
     #Clear Page2
     output$EventPage2 <- renderUI(NULL)
