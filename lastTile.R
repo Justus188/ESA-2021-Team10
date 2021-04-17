@@ -58,13 +58,3 @@ nameModal <- function(){modalDialog(
     actionButton("name.done", "That's my name!")
   )
 )}
-
-publishedModal <- function(){modalDialog(
-  title = "Your score has been published!",
-  "Your score has been published! Do you see it in the leaderboard?",
-  tableOutput("leaderboard,"),
-  footer = tagList(
-    actionButton("quit_publishedModal", "Quit"),
-    actionButton("start_publishedModal", "Restart")
-  )
-)}
