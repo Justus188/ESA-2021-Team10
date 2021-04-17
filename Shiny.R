@@ -117,8 +117,8 @@ ui <- dashboardPage( ###########################################################
                                        #),
                                        uiOutput("choosemenu"),
                                        uiOutput("foodimg"),
-                                       # textOutput("foodingredients"),
-                                       # textOutput("fillinglevel"),
+                                       textOutput("foodingredients"),
+                                       textOutput("fillinglevel"),
                                        actionButton("choosefood_yes","ok")
                                      ),
                                      
@@ -182,7 +182,7 @@ ui <- dashboardPage( ###########################################################
 server <- function(input, output, session) {####################################
   ### Init variables ###########################################################
   # Static variables
-  allmenu <- rbind(getallMenu(),c("Eat Nothing",0,0,0,"Blank.png",-1)) #df with all menu items
+  allmenu <- rbind(getallMenu(),c(-1,"Eat Nothing",0,0,0,"Blank.png",0,0)) #df with all menu items
   
   # Reactive variables
   vals <- reactiveValues(calories = 0,            ### Game variables, generated on start()
@@ -203,18 +203,33 @@ server <- function(input, output, session) {####################################
           )
   
   ### WORK IN PROGRESS: TO SHIFT DOWN EVENTUALLY ###############################
-  output$img1 <- renderUI({
-    if(input$Chosenfood == food1name){
-      img(src = food1_image,height = 200, width = 200)}
-    else if(input$Chosenfood == food2name){
-      img(src = food2_image, height = 200, width = 200)}
-    else if(input$Chosenfood == food3name){
-      img(src = food3_image,height = 200, width = 200)}
-    else if(input$Chosenfood == food4name){
-      img(src = food4_image,height = 200, width = 200)}
-    else if(input$Chosenfood == food5name){
-      img(src = food5_image,height = 200, width = 200)}
+  
+  
+  # output$img1 <- renderUI({
+  #   if(input$Chosenfood == food1name){
+  #     img(src = food1_image,height = 200, width = 200)}
+  #   else if(input$Chosenfood == food2name){
+  #     img(src = food2_image, height = 200, width = 200)}
+  #   else if(input$Chosenfood == food3name){
+  #     img(src = food3_image,height = 200, width = 200)}
+  #   else if(input$Chosenfood == food4name){
+  #     img(src = food4_image,height = 200, width = 200)}
+  #   else if(input$Chosenfood == food5name){
+  #     img(src = food5_image,height = 200, width = 200)}
+  # })
+  
+  output$foodimg <- renderUI({
+    img(src = allmenu[allmenu$Food == input$Chosenfood,"FoodImage"],height = 200,width = 200)
   })
+  
+  output$foodingredients <- renderText({
+    paste("Main ingredients:",allmenu[allmenu$Food == input$Chosenfood,"Ingredients"])
+  })
+  
+  output$fillinglevel <- renderText({
+    paste("Filling level:",allmenu[allmenu$Food == input$Chosenfood,"Filling"])
+  })
+  
   
   # output$foodingredients <- renderText({
   #   if(input$Chosenfood == food1name){
@@ -288,7 +303,6 @@ server <- function(input, output, session) {####################################
       vals$dieNumber <- 6
       vals$boardstate <- -1
       vals$playerpos <- c(9, 9)
-      vals$turndiff <- 0
       vals$action.log <- data.frame(Event="Start", Calories=0, Hunger=2000)
       
       updateTabItems(session, "tabSelect", "gameboard") # Shift active window to gameboard
@@ -450,7 +464,7 @@ server <- function(input, output, session) {####################################
     output$EventPage3 <- renderUI({
       tagList(
         tags$h2(getEventName(vals$event_no)),
-        tags$b(getEventDescription(vals$event_no)),
+        tags$h2(getEventDescription(vals$event_no)),
         actionButton(inputId="continuebutton", label="Continue")
       )}) 
   })
