@@ -33,7 +33,6 @@ genCellIds <- function(){
   initIds[1:10] <- paste0("0", initIds[1:10])
   initIds
 }
-listofcells = lapply(genCellIds(), function(x) return(paste0("cell", x)))
 renderCell <- function(playerpos, cellid, input, isEvent){
   # Renders token if occupied, else empty
   row <- as.integer(substr(cellid, 1,1))
@@ -46,7 +45,7 @@ renderCell <- function(playerpos, cellid, input, isEvent){
         imgsrc <- paste0("www/",getTokenSrc(input))
       } else if (isEvent[row+1, col+1]){
         #some event picture
-        imgsrc <- "www/token3.png"
+        imgsrc <- "www/eventTilepic.png"
       }
     }
     # Unfortunately, we are not able to re-size the image and still have the click event work.
@@ -183,6 +182,8 @@ server <- function(input, output, session) {####################################
   ### Init variables ###########################################################
   # Static variables
   allmenu <- rbind(getallMenu(),c(-1,"Eat Nothing",0,0,0,"Blank.png",0,0)) #df with all menu items
+  cellIds <- genCellIds()
+  listofcells <- lapply(cellIds, function(x) return(paste0("cell", x)))
   
   # Reactive variables
   vals <- reactiveValues(calories = 0,            ### Game variables, generated on start()
@@ -264,7 +265,7 @@ server <- function(input, output, session) {####################################
   output$playertokenimg <- renderUI(img(src = getTokenSrc(input), height=50, width=50))
   
   observeEvent(c(vals$playerpos, vals$isEvent),{
-    mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input, vals$isEvent)}, x=listofcells, y=genCellIds())
+    mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input, vals$isEvent)}, x=listofcells, y=cellIds)
   })
   
   output$hunger_scale <- renderImage(list(src = paste0("www/hunger", as.integer(7-vals$hunger/1000), ".png")), deleteFile=F)
