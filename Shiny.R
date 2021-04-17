@@ -451,11 +451,9 @@ server <- function(input, output, session) {####################################
     
     #Should add in parts to modify Hunger, Calories.
     newCalories <- getEventCalories(vals$event_no)
-    newHunger <- getEventHunger(vals$event_no)
     
     vals$calories = vals$calories + newCalories
-    vals$hunger = vals$hunger + newHunger
-    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=newHunger)
+    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=NA)
     
     #Clear Page2
     output$EventPage2 <- renderUI(NULL)
