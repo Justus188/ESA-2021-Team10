@@ -395,7 +395,7 @@ server <- function(input, output, session) {####################################
     vals$event_no <- sample(1:getMaxNumberOfEvents(), 1)
     
     #Should add in parts to modify Hunger, Calories.
-    newCalories <- getEventCalorie(vals$event_no)
+    newCalories <- getEventCalories(vals$event_no)
     newHunger <- getEventHunger(vals$event_no)
     
     vals$calories = vals$calories + newCalories
@@ -416,7 +416,7 @@ server <- function(input, output, session) {####################################
   )
   
   observeEvent(input$continuebutton,{
-    #Should go back to play the game, is it just this ???
+    output$EventPage3 <- renderUI(NULL)
     vals$boardstate <- -1
     vals$turndiff <- vals$turndiff -1
   })

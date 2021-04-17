@@ -68,8 +68,8 @@ getQuestionExplanation <- function(qn_no){
   as.character(result[[1]])
 }
 
-getEventCalorie <- function(event_no){
-  query <- str_c("SELECT Calorie FROM CarelorieEvents WHERE EventNumber=", event_no)
+getEventCalories <- function(event_no){
+  query <- str_c("SELECT Calories FROM CarelorieEvents WHERE EventNumber=", event_no)
   
   result <- getQuery(query)
   
