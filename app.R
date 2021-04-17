@@ -93,7 +93,7 @@ ui <- dashboardPage( ###########################################################
                      sidebarLayout( 
                        # the trick here is to make the gameboard image 'position:absolute;z-order:0'; 
                        # Then, to superimpose images, style them to be 'position:relative;z-order:999'
-                       mainPanel(width=10,
+                       mainPanel(width=7,
                                  img(src='board.png',style="position:absolute;z-order:0",width="525px",height="505px"),
                                  createRow(0), tags$br(),
                                  createRow(1), tags$br(),
@@ -105,7 +105,7 @@ ui <- dashboardPage( ###########################################################
                                  createRow(7), tags$br(),
                                  createRow(8), tags$br(),
                                  createRow(9), tags$br()),
-                       sidebarPanel( width = 2,
+                       sidebarPanel( width = 5,
                                      "Hunger Meter:",
                                      imageOutput("hunger_scale", height = "100px", width = "100px"),
                                      # only show this panel if player is rolling the die
@@ -488,6 +488,7 @@ server <- function(input, output, session) {####################################
   observeEvent(input$publish, showModal(nameModal()))    # Get player name
   
   observeEvent(input$name.done, {
+    removeModal()
     publishScore(input$name.name, vals$calories)         # We aren't checking for repeats because there isn't a password / name booking system
                                                          # The idea is oldschool arcade style leaderboards
     vals$recent_score <- NA                              # No double publishing the same game
