@@ -1,4 +1,8 @@
-for (pkg in c("shiny", "DBI", "shinydashboard", "shinybusy", "tidyverse")) library(pkg, character.only=T)
+library(DBI)
+library(shiny)
+library(shinybusy)
+library(shinydashboard)
+library(tidyverse)
 
 ### Helper Functions ###########################################################
 ### General Helpers
@@ -140,10 +144,10 @@ checkAnswer <- function(qn_no,selected_ans){
   result <- as.character(result[[1]])
   
   if (selected_ans==result){
-    print("Check Result: Correct")
+    # print("Check Result: Correct")
     TRUE
   }else if (selected_ans!=result){
-    print("Check Result: Wrong")
+    # print("Check Result: Wrong")
     FALSE
   }
 }

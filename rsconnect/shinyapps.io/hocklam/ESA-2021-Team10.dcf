@@ -5,8 +5,9 @@ account: hocklam
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3983703
-bundleId: 4484150
+bundleId: 4484245
 url: https://hocklam.shinyapps.io/ESA-2021-Team10/
-when: 1618677008.7224
+when: 1618679386.15431
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: ESAProject2021Team10.zip
