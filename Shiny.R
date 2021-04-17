@@ -288,6 +288,7 @@ server <- function(input, output, session) {####################################
       vals$dieNumber <- 6
       vals$boardstate <- -1
       vals$playerpos <- c(9, 9)
+      vals$turndiff <- 0
       vals$action.log <- data.frame(Event="Start", Calories=0, Hunger=2000)
       
       updateTabItems(session, "tabSelect", "gameboard") # Shift active window to gameboard

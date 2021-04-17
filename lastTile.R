@@ -21,7 +21,7 @@ getQuery <- function(query) {
   result
 }
 
-getLeaderBoard <- function() getQuery("SELECT Player, Calories FROM CarelorieLeaderboard ORDER BY calories DESC LIMIT 10")
+getLeaderBoard <- function() getQuery("SELECT Player, Calories FROM CarelorieLeaderboard ORDER BY calories ASC LIMIT 10")
 
 getRandomPlayerName <- function() getQuery("SELECT * FROM LeaderRandomName")$playername[1]
 
