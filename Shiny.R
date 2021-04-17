@@ -144,12 +144,12 @@ ui <- dashboardPage( ###########################################################
                          tabItem(tabName = "leaderboard", 
                                  h2("Hall of Fame"),
                                  # conditionalPanel(
-                                 #   condition="output.recent_game==true",
-                                 #   textOuput("recent_score"),
+                                 #   condition="output.recent_game_toggle ==true",
+                                 #   textOuput("recent_game"),
                                  #   actionButton("publish", "Publish Your Score!")
                                  # ),
                                  # conditionalPanel(
-                                 #   condition="output.recent_publish==true",
+                                 #   condition="output.recent_publish_toggle ==true",
                                  #   textOutput("pubilish_success")
                                  # ),
                                  box(
@@ -220,7 +220,10 @@ server <- function(input, output, session) {####################################
                          action.log = NA, # generated on start
                          ### Trackers for conditional statements
                          turndiff = 0,
-                         startbuttons = rep(0,4) #TODO: Update if changing number of start buttons
+                         startbuttons = rep(0,4), #TODO: Update if changing number of start buttons
+                         lastbutton_start = F,
+                         recent_score = NA,
+                         recent_publish = NA
           )
   
   ### WORK IN PROGRESS: TO SHIFT DOWN EVENTUALLY ###############################
@@ -288,10 +291,11 @@ server <- function(input, output, session) {####################################
   
   ### GAME LOGIC ###############################################################
   output$gameboard_gated <- renderMenu({
-    if(any(c(input$start_welcome, input$start_leaderboard)>0)) menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board"))
+    if(vals$lastbutton_start) menuItem("Gameboard", tabName = "gameboard", icon = icon("chess-board"))
   })
   
   observe({ # Start game button
+    vals$lastbutton_start <- T
     curr_start_buttons <- c(input$start_welcome, input$start_leaderboard, input$start_endModal, input$start_publishedModal)
     curr_start_buttons[is.na(curr_start_buttons)] <- 0
     diff <- which(curr_start_buttons - vals$startbuttons == 1)
@@ -337,13 +341,26 @@ server <- function(input, output, session) {####################################
       print(paste0("Die rolled: ", vals$dieNumber, ", Player Pos: ", vals$playerpos[1], vals$playerpos[2])) ### DEBUG
       
       vals$boardstate <- checktile(currentrow, currentcol, vals$isEvent) # Boardstates: -1: Dice, 0 Event, 1 Restaurant, 2 End
-      if(vals$boardstate ==2) showModal(endModal())
+      if(vals$boardstate ==2) {
+        vals$action.log <- add_row(vals$action.log, Event="Total", Calories=vals$calories, Hunger=vals$hunger)
+        vals$recent_score <- vals$calories
+        showModal(endModal()
+      })
     }
   })
   
   output$dice <- reactive(vals$boardstate == -1)
   output$event <- reactive(vals$boardstate == 0)
   output$restaurant <- reactive(vals$boardstate == 1)
+  
+  output$recent_game_toggle <- reactive(!is.na(vals$recent_score))
+  output$recent_game <- renderText(paste("Your most recent score is", vals$recent_score))
+  
+  output$recent_publish_toggle <- reactive(!is.na(vals$recent_publish))
+  output$publish_success <- renderText(paste("Successfully published", vals$recent_publish, "to leaderboard!"))
+
+  for (outputpanel in c("dice", "event", "restaurant", "recent_game_toggle", "recent_publish_toggle")) outputOptions(output, outputpanel, suspendWhenHidden=F)
+  
   output$choosemenu <- renderUI({
     selectInput(
       "Chosenfood",
@@ -354,7 +371,6 @@ server <- function(input, output, session) {####################################
   observeEvent(input$start_welcome,{
     updateTabItems(session,"tabSelect","gameboard")
   })
-  for (outputpanel in c("dice", "event", "restaurant")) outputOptions(output, outputpanel, suspendWhenHidden=F)
   
   ### Restaurant Logic
   observeEvent(input$choosefood_yes,{
@@ -468,13 +484,18 @@ server <- function(input, output, session) {####################################
   
   ### endModal renders
   output$actionlog <- renderTable(vals$action.log)
-  observeEvent(input$goto_leaderboard, updateTabItems(session, "tabSelect", "leaderboard"))
+  observeEvent(input$goto_leaderboard, {
+    vals$lastbutton_start <- F
+    updateTabItems(session, "tabSelect", "leaderboard")
+  })
   output$leaderboard_publishedModal <- leaderBoard
-  
+
   ### Publish
   observeEvent(input$publish, showModal(nameModal())) # Get player name
   observeEvent(input$name.done, {
     publishScore(input$name.name, vals$calories)
+    vals$recent_score <- NA
+    vals$recent_publish <- input$name.name
     showModal(publishedModal())
   })
   
