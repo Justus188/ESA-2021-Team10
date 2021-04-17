@@ -118,10 +118,11 @@ ui <- dashboardPage( ###########################################################
                                                  conditionalPanel(
                                                    condition = "output.restaurant == true",
                                                    tags$h1("Menu"), # change the food names to random 5 food names from database
-                                                   selectInput(inputId = "Chosenfood", 
-                                                               label = "Please choose something:",   
-                                                               getMenu()[,"Food"]
-                                                   ),
+                                                   #selectInput(inputId = "Chosenfood", 
+                                                   #            label = "Please choose something:",   
+                                                   #            getMenu()[,"Food"]
+                                                   #),
+                                                   uiOutput("choosemenu"),
                                                    uiOutput("foodimg"), textOutput("foodingredients"), 
                                                    textOutput("fillinglevel"),
                                                    actionButton("choosefood_yes","ok"),
@@ -283,6 +284,7 @@ server <- function(input, output, session) {####################################
   # })
   
   observeEvent(input$clickdie,{ #TODO: Implement a counter to click spam
+    vals$menu <- getMenu()
     if (vals$turndiff == 0){
       vals$turndiff = vals$turndiff +1
       vals$dieNumber = as.integer(runif(1,1,7))
@@ -310,6 +312,16 @@ server <- function(input, output, session) {####################################
   output$dice <- reactive(vals$boardstate == -1)
   output$event <- reactive(vals$boardstate == 0)
   output$restaurant <- reactive(vals$boardstate == 1)
+  output$choosemenu <- renderUI({
+    selectInput(
+      "Chosenfood",
+      "Choose food",
+      vals$menu[,"Food"]
+    )
+  })
+  observeEvent(input$start_welcome,{
+    updateTabItems(session,"tabSelect","gameboard")
+  })
   for (outputpanel in c("dice", "event", "restaurant")) outputOptions(output, outputpanel, suspendWhenHidden=F)
   
   ### Restaurant Logic
