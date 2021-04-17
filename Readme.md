@@ -11,8 +11,8 @@ This repo was originally created to facilitate collaboration for the creation of
 - shinydashboard
 - tidyverse
 <br> <br>
-This Shiny app was made to interface with a database on AWS, which will cease to exist by the time you read this.
-Nonetheless, the database has been downloaded as csv should you wish to recreate it.
+This Shiny app was made to interface with a database on AWS, which will cease to exist by the time you read this. <br>
+Nonetheless, the database has been downloaded as csv should you wish to recreate it. <br>
 It should be noted that LeaderPlayer was a table that generated random player names from another Table with a list of words, but has since lost that functionality as a csv.
 
 # Contributors
