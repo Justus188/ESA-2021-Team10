@@ -141,12 +141,18 @@ getQuestionStatement <- function(qn_no){
 checkAnswer <- function(qn_no,selected_ans){
   query <- str_c("SELECT QuestionAnswer FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
   result <- getQuery(query)
-  result <- as.character(result[[1]])
+  result <- as.numeric(result[[1]])
   
-  if (selected_ans==result){
+  if (selected_ans=="TRUE"){
+    mod_ans <- 1
+  }else{
+    mod_ans <- 0
+  }
+  
+  if (mod_ans==result){
     # print("Check Result: Correct")
     TRUE
-  }else if (selected_ans!=result){
+  }else if (mod_ans!=result){
     # print("Check Result: Wrong")
     FALSE
   }
