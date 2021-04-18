@@ -500,7 +500,6 @@ server <- function(input, output, session) {####################################
       
       # print(paste0("Die rolled: ", vals$dieNumber, ", Player Pos: ", vals$playerpos[1], vals$playerpos[2])) ### DEBUG
       
-      
       vals$boardstate <- checktile(currentrow, currentcol, vals$isEvent) # Boardstates: -1 Dice, 0 Event, 1 Restaurant, 2 End
       if(vals$boardstate == 1) vals$menu <- getMenu() # Generate random menu
       if(vals$boardstate ==2) {
@@ -546,15 +545,17 @@ server <- function(input, output, session) {####################################
                                              str_to_title(allmenu[allmenu$Food == input$Chosenfood,"Filling"]))))
   
   observeEvent(input$choosefood_yes,{ # Choose food -> update stats
-    newCalories <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Calories"])
-    newHunger <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Hunger"])
-    
-    vals$calories <- vals$calories + newCalories
-    vals$hunger <- vals$hunger + newHunger
-    vals$action.log <- add_row(vals$action.log, Event=paste("Consumed", input$Chosenfood), Calories=newCalories, Hunger=newHunger)
-    
-    vals$turndiff <- vals$turndiff -1 # End of action phase
-    vals$boardstate <- -1             # Set state to movement
+    if (vals$turndiff == 1){ # Prevents breaking from spamming continue - only possible due to lag on shinyapps
+      newCalories <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Calories"])
+      newHunger <- as.integer(allmenu[allmenu$Food == input$Chosenfood,"Hunger"])
+      
+      vals$calories <- vals$calories + newCalories
+      vals$hunger <- vals$hunger + newHunger
+      vals$action.log <- add_row(vals$action.log, Event=paste("Consumed", input$Chosenfood), Calories=newCalories, Hunger=newHunger)
+      
+      vals$turndiff <- vals$turndiff -1 # End of action phase
+      vals$boardstate <- -1             # Set state to movement
+    }
   })
   
   ### Event logic
@@ -624,15 +625,6 @@ server <- function(input, output, session) {####################################
   })  
   
   observeEvent(input$proceedbutton, {
-    ##Randomly choose 1 event,
-    #vals$event_no <- sample(1:getMaxNumberOfEvents(), 1)
-    
-    #Should add in parts to modify Hunger, Calories.
-    newCalories <- getEventCalories(vals$event_no)
-    
-    vals$calories = vals$calories + newCalories
-    vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=0)
-    
     #Clear Page2
     output$EventPage2 <- renderUI(NULL)
     
@@ -646,9 +638,15 @@ server <- function(input, output, session) {####################################
   })
   
   observeEvent(input$continuebutton,{
-    output$EventPage3 <- renderUI(NULL)
-    vals$boardstate <- -1
-    vals$turndiff <- vals$turndiff -1
+    if (vals$turndiff == 1){                             # Prevents breaking from spamming continue - only possible due to lag on shinyapps
+      newCalories <- getEventCalories(vals$event_no)
+      vals$calories = vals$calories + newCalories
+      vals$action.log <- add_row(vals$action.log, Event=getEventName(vals$event_no), Calories=newCalories, Hunger=0)
+      
+      output$EventPage3 <- renderUI(NULL)
+      vals$boardstate <- -1
+      vals$turndiff <- vals$turndiff -1
+    }
   })
   
   ### End of game
