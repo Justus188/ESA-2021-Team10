@@ -7,6 +7,7 @@ library(tidyverse)
 ### Helper Functions ###########################################################
 ### General Helpers
 getAWSConnection <- function(){
+  # Creator: Hock Lam
   dbConnect(
     drv = RMySQL::MySQL(),
     dbname = "student061",
@@ -16,6 +17,7 @@ getAWSConnection <- function(){
 }
 
 getQuery <- function(query) {
+  # Creator: Hock Lam
   conn <- getAWSConnection()
   result <- dbGetQuery(conn, query)
   dbDisconnect(conn)
@@ -23,16 +25,19 @@ getQuery <- function(query) {
 }
 
 createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="50px", width = "50px", inline = T))
+# Creator: Hock Lam
 
 createRow <- function(i) return(lapply(0:9, createTile, i = i))
+# Creator: Hock Lam
 
-genCellIds <- function(){
+genCellIds <- function(){ #Creator: Hock Lam
   initIds = as.character(0:99)
   initIds[1:10] <- paste0("0", initIds[1:10])
   initIds
 }
 
 renderCell <- function(playerpos, cellid, input, isEvent){
+  # Creator: Hock Lam, Max
   # Renders token if occupied, else empty
   row <- as.integer(substr(cellid, 1,1))
   col <- as.integer(substr(cellid, 2,2))
@@ -55,11 +60,14 @@ renderCell <- function(playerpos, cellid, input, isEvent){
 }
 
 getTokenSrc <- function(input) return(paste0("token", switch(input$playertoken, "Burger"=1, "Fries"=2, "Apple"=3), ".png"))
+# Creator: Max; Editor: Hock Lam
 
 ### Movement
 checktile <- function(row, col, isEvent) if (isEvent[row+1, col+1]) 0 else if (row==8 && col == 9) 2 else 1
+# Creator: Max; Editor: Hock Lam
 
 updateBoardState <- function(playerpos,dieNumber){
+  # Creator: Hock Lam, Max
   row <- playerpos[1]
   col <- playerpos[2]
   
@@ -81,13 +89,18 @@ updateBoardState <- function(playerpos,dieNumber){
 }
 
 ### Restaurant
+blankRow <- function() c(-1,"Nothing","Your weighing scale weighs heavily on your mind...",0,0,"Blank.png","Air","A tiny bit")
+# Creator: Hock Lam
+
 getallMenu <- function(){
+  # Creator: Max
   #extract a df of all menu items
   query <- "SELECT * FROM CarelorieMenu"
   getQuery(query)
 }
 
 getMenu <- function(){
+  # Creator: Max
   # Extract random menu from database
   allmenu <- getallMenu()
   foodtype <- unique(allmenu$Foodtype)
@@ -95,35 +108,33 @@ getMenu <- function(){
   query <- paste0("SELECT * FROM CarelorieMenu WHERE Foodtype = '" ,selectedfoodtype,"' ORDER BY RAND() LIMIT 5")
   selectedmenu <- getQuery(query)
   
-  selectedmenu <- rbind(selectedmenu,c(-1,"Nothing","Your weighing scale weighs heavily on your mind...",0,0,"Blank.png","Air","A tiny bit"))
+  selectedmenu <- rbind(selectedmenu,blankRow())
 }
 
 ### Event
 getMaxNumberOfEvents <- function(){
+  # Creator: Peckee
   query <- "SELECT MAX(EventNumber) FROM CarelorieEvents"
   result <- getQuery(query)
   as.numeric(result[[1]])
 }
 
 getEventName <- function(event_no){
+  # Creator: Peckee
   query <- str_c("SELECT EventName FROM CarelorieEvents WHERE EventNumber=",event_no)
   result <- getQuery(query)
   as.character(result[[1]])
 }
 
 getEventDescription <- function(event_no){
+  # Creator: Peckee
   query <- str_c("SELECT EventDescription FROM CarelorieEvents WHERE EventNumber=",event_no)
   result <- getQuery(query)
   as.character(result[[1]])
 }
 
-#getEventType <- function(event_no){
-#  query <- str_c("SELECT EventType FROM CarelorieEvents WHERE EventNumber=", event_no)
-#  result <- getQuery(query)
-#  as.numeric(result[[1]])
-#}
-
 getEventType <- function(correct){
+  # Creator: Peckee; Editor: Yuying
   if (correct == TRUE) {
     event_type = "Good"}
   else{
@@ -136,6 +147,7 @@ getEventType <- function(correct){
 }
 
 getRandQuestionNo <- function(){
+  # Creator: Peckee
   query <- "SELECT QuestionNo FROM CarelorieQuestions ORDER BY RAND() LIMIT 1"
   result <- getQuery(query)
   
@@ -144,6 +156,7 @@ getRandQuestionNo <- function(){
 }
 
 getQuestionStatement <- function(qn_no){
+  # Creator: Peckee
   query <- str_c("SELECT QuestionStatement FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
   result <- getQuery(query)
   
@@ -151,6 +164,7 @@ getQuestionStatement <- function(qn_no){
 }
 
 checkAnswer <- function(qn_no,selected_ans){
+  # Creator: Peckee
   query <- str_c("SELECT QuestionAnswer FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
   result <- getQuery(query)
   result <- as.numeric(result[[1]])
@@ -171,6 +185,7 @@ checkAnswer <- function(qn_no,selected_ans){
 }
 
 getQuestionExplanation <- function(qn_no){
+  # Creator: Peckee
   query <- str_c("SELECT QuestionExplanation FROM CarelorieQuestions WHERE QuestionNo=", qn_no)
   
   result <- getQuery(query)
@@ -179,6 +194,7 @@ getQuestionExplanation <- function(qn_no){
 }
 
 getEventCalories <- function(event_no){
+  # Creator: Peckee
   query <- str_c("SELECT Calories FROM CarelorieEvents WHERE EventNumber=", event_no)
   
   result <- getQuery(query)
@@ -187,6 +203,7 @@ getEventCalories <- function(event_no){
 }
 
 getEventHunger <- function(event_no){ #Unimplemented due to time constraints
+  # Creator: Peckee
   query <- str_c("SELECT Hunger FROM CarelorieEvents WHERE EventNumber=", event_no)
   
   result <- getQuery(query)
@@ -195,12 +212,14 @@ getEventHunger <- function(event_no){ #Unimplemented due to time constraints
 }
 
 ### End of game
-
 getLeaderBoard <- function() getQuery("SELECT Player, Calories FROM CarelorieLeaderboard ORDER BY calories ASC LIMIT 10")
+# Creator: Hock Lam
 
 getRandomPlayerName <- function() getQuery("SELECT * FROM LeaderRandomName")$playername[1]
+# Creator: Hock Lam
 
 publishScore <- function(name, calories){
+  # Creator: Hock Lam
   conn <- getAWSConnection()
   query <- paste0("INSERT INTO CarelorieLeaderboard (Player, Calories) VALUES (?id1, ", calories, ")")
   query <- sqlInterpolate(conn, query, id1=name)
@@ -214,6 +233,7 @@ publishScore <- function(name, calories){
 
 ### Modals #####################################################################
 starvingModal <- function(){
+  # Creator: Max
   modalDialog(
     title = "You are starving. You have no choice but to stuff your face with food.",
     footer = tagList(
@@ -223,6 +243,7 @@ starvingModal <- function(){
 }
 
 endModal <- function() {modalDialog(
+  # Creator: Hock Lam
   title = "The End!",
   "Congratulations! Here is a summary of what you did this run!",
   tableOutput("actionlog"),
@@ -234,6 +255,7 @@ endModal <- function() {modalDialog(
 )}
 
 nameModal <- function(){modalDialog(
+  # Creator: Hock Lam
   title = "Input your name!",
   textInput("name.name", "Your name is: ", getRandomPlayerName()),
   "(You can change it!)",
@@ -244,6 +266,7 @@ nameModal <- function(){modalDialog(
 )}
 
 ui <- dashboardPage( ###########################################################
+  # Creator: Hock Lam, Kaiting, Max, Peckee, Yuying
          dashboardHeader(title = "CARElorie"),
          dashboardSidebar(
            sidebarMenu(
@@ -339,7 +362,7 @@ ui <- dashboardPage( ###########################################################
                      ),
                      conditionalPanel(
                        condition="output.recent_publish_toggle ==true",
-                       box(textOutput("pubilish_success"))
+                       box(textOutput("publish_success"))
                      ),
                      box(
                        title = "See where you stand!",width=12,
@@ -376,9 +399,10 @@ ui <- dashboardPage( ###########################################################
          ))
 
 server <- function(input, output, session) {####################################
+  # Creator: Hock Lam, Kaiting, Max, Peckee, Yuying
   ### Init variables ###########################################################
   # Static variables
-  allmenu <- rbind(getallMenu(),c(-1,"Nothing","Your weighing scale weighs heavily on your mind...",0,0,"Blank.png","Air","A tiny bit")) #df with all menu items
+  allmenu <- rbind(getallMenu(),blankRow()) #df with all menu items
   cellIds <- genCellIds()
   listofcells <- lapply(cellIds, function(x) return(paste0("cell", x)))
   
