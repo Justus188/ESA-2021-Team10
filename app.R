@@ -117,10 +117,22 @@ getEventDescription <- function(event_no){
   as.character(result[[1]])
 }
 
-getEventType <- function(event_no){
-  query <- str_c("SELECT EventType FROM CarelorieEvents WHERE EventNumber=", event_no)
+#getEventType <- function(event_no){
+#  query <- str_c("SELECT EventType FROM CarelorieEvents WHERE EventNumber=", event_no)
+#  result <- getQuery(query)
+#  as.numeric(result[[1]])
+#}
+
+getEventType <- function(correct){
+  if (correct == TRUE) {
+    event_type = "Good"}
+  else{
+    event_type = "Bad"}
+  query <- str_c("SELECT EventNumber FROM CarelorieEvents WHERE EventType='",event_type,"'")
   result <- getQuery(query)
-  as.numeric(result[[1]])
+  result1 <- result$EventNumber # convert df to a list
+  result1
+  
 }
 
 getRandQuestionNo <- function(){
@@ -176,14 +188,6 @@ getEventCalories <- function(event_no){
 
 getEventHunger <- function(event_no){ #Unimplemented due to time constraints
   query <- str_c("SELECT Hunger FROM CarelorieEvents WHERE EventNumber=", event_no)
-  
-  result <- getQuery(query)
-  
-  as.numeric(result[[1]])
-}
-
-getEventType <- function(event_no){
-  query <- str_c("SELECT EventType FROM CarelorieEvents WHERE EventNumber=", event_no)
   
   result <- getQuery(query)
   
@@ -547,6 +551,8 @@ server <- function(input, output, session) {####################################
     # print(paste0("QuestionNo: ", vals$QuestionNo,", SelectedAns: ", input$selectedAns,", Outcome: ",outcome)) ###DEBUG
     
     if (outcome==TRUE){
+      correct <- TRUE
+      vals$event_no <- sample(getEventType(correct), 1)
       #Tell them that they selected the correct answer
       #Change the button from Check to Proceed to Event
       
@@ -567,6 +573,8 @@ server <- function(input, output, session) {####################################
           actionButton(inputId="proceedbutton", label="Proceed!"))})
       #Able to Proceed to Random Events page
     } else {
+      correct <- FALSE
+      vals$event_no <- sample(getEventType(correct), 1)
       #Tell them that they selected the wrong answer
       #Change the button from Check to Proceed to Event
       #Close the current modal
@@ -592,7 +600,7 @@ server <- function(input, output, session) {####################################
   
   observeEvent(input$proceedbutton, {
     ##Randomly choose 1 event,
-    vals$event_no <- sample(1:getMaxNumberOfEvents(), 1)
+    #vals$event_no <- sample(1:getMaxNumberOfEvents(), 1)
     
     #Should add in parts to modify Hunger, Calories.
     newCalories <- getEventCalories(vals$event_no)
