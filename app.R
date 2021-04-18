@@ -397,7 +397,7 @@ server <- function(input, output, session) {####################################
     mapply(function(x, y) {output[[x]] <- renderCell(vals$playerpos, y, input, vals$isEvent)}, x=listofcells, y=cellIds)
   })
   
-  output$hunger_scale <- renderImage(list(src = paste0("www/hunger", as.integer(7-vals$hunger/1000), ".png")), deleteFile=F)
+  output$hunger_scale <- renderImage(list(src = paste0("www/hunger", max(as.integer(7-vals$hunger/600),0), ".png")), deleteFile=F)
   output$die <- renderImage({
     #select the icon appropriate for this die
     imageid <- vals$dieNumber
