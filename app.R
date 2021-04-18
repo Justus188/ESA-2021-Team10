@@ -30,7 +30,8 @@ createTile <- function(j, i=0) return(imageOutput(paste0("cell", i, j), height="
 createRow <- function(i) return(lapply(0:9, createTile, i = i))
 # Creator: Hock Lam
 
-genCellIds <- function(){ #Creator: Hock Lam
+genCellIds <- function(){
+  # Creator: Hock Lam
   initIds = as.character(0:99)
   initIds[1:10] <- paste0("0", initIds[1:10])
   initIds
@@ -223,7 +224,7 @@ publishScore <- function(name, calories){
   conn <- getAWSConnection()
   query <- paste0("INSERT INTO CarelorieLeaderboard (Player, Calories) VALUES (?id1, ", calories, ")")
   query <- sqlInterpolate(conn, query, id1=name)
-  print(query)
+  #print(paste("Published", name, "with score", calories))###DEBUG
   
   nrows <- dbExecute(conn, query)
   if(nrows!=1) print("writeLeaderBoard() inserted != 1 row. Something went wrong.")
@@ -260,7 +261,7 @@ nameModal <- function(){modalDialog(
   textInput("name.name", "Your name is: ", getRandomPlayerName()),
   "(You can change it!)",
   footer= tagList(
-    actionButton("quit_nameModal", "Quit"),
+    actionButton("nameModal_to_leaderboard", "I changed my mind"),
     actionButton("name.done", "That's my name!")
   )
 )}
@@ -442,7 +443,7 @@ server <- function(input, output, session) {####################################
     list(src=imgsrc,style="position:relative;z-order:999;")
   },deleteFile=FALSE)
   
-  output$leaderboard <- renderTable({input$name.done; getLeaderBoard()})
+  output$leaderboard <- renderTable({vals$recent_publish; getLeaderBoard()})
   
   ### Game Logic ###############################################################
   observeEvent(vals$in_progress, { # Hide gameboard if game not in progress
@@ -661,6 +662,11 @@ server <- function(input, output, session) {####################################
   ### Publish
   observeEvent(input$publish, showModal(nameModal()))    # Get player name
   
+  observeEvent(input$nameModal_to_leaderboard, {         # You change your mind
+    removeModal()                                        # Like a girl changes clothes
+    updateTabItems(session, "tabSelect", "leaderboard")  # Or like we change our code
+  })
+  
   observeEvent(input$name.done, {
     removeModal()
     publishScore(input$name.name, vals$calories)         # We aren't checking for repeats because there isn't a password / name booking system
@@ -671,7 +677,7 @@ server <- function(input, output, session) {####################################
   })
   
   ### Quit via button
-  observe(if(any(c(input$quit_endModal, input$quit_nameModal, input$quit_publishedModal)>0)) stopApp())
+  observeEvent(input$quit_endModal, stopApp(), ignoreInit=T)
 }
 
 shinyApp(ui, server)
